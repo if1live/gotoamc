@@ -35,7 +35,7 @@ void FrameStack::push( Frame* _pFrame )
 Frame* FrameStack::pop()
 {
 	if ( isEmpty() == true )
-		return "stack pop error: stack is empty";
+		throw "stack pop error: stack is empty";
 	
 	return ppArray[m_top--];
 }
