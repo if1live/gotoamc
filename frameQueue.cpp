@@ -68,8 +68,8 @@ void FrameQueue::push(Frame *_pFrame)
 		}
 		
 		// switch to newQueue
-		mFront = 2*capacity-1;
-		mRear = capacity - 2;
+		mRear = mFront + capacity - 1;
+		capacity = capacity * 2;
 		delete[] ppQueue;
 		ppQueue = newQueue;
 	}
@@ -82,6 +82,7 @@ Frame* FrameQueue::pop()
 {
 	if(isEmpty()) throw "Queue is empty";
 	mFront = (mFront + 1)%capacity;
+
 	return ppQueue[mFront];
 }
 

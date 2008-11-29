@@ -64,8 +64,8 @@ private:
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video
 
 	///TODO : change to stack
-	FrameHeap *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
-	FrameHeap *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
+	FrameStack *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
+	FrameStack *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
 
 	//this is test code
 	AVFrame *pInputFrame;

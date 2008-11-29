@@ -12,10 +12,10 @@ public:
 	Frame* pop();
 	bool isEmpty();
 	bool isFull();
-	Frame* getTop();
+	Frame* top();
 
 private:
 	Frame** ppArray;
 	int capacity;
-	int top;
+	int m_top;
 };

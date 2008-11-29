@@ -5,7 +5,7 @@
 FrameStack::FrameStack( int _capacity )
 {
 	capacity = _capacity;
-	top = -1;
+	m_top = -1;
 	ppArray = new Frame*[capacity];
 }
 
@@ -28,7 +28,7 @@ void FrameStack::push( Frame* _pFrame )
 		capacity = capacity * 2;
 	}
 
-	ppArray[++top] = _pFrame;
+	ppArray[++m_top] = _pFrame;
 }
 
 Frame* FrameStack::pop()
@@ -36,12 +36,12 @@ Frame* FrameStack::pop()
 	if ( isEmpty() == true )
 		return NULL;
 	
-	return ppArray[top--];
+	return ppArray[m_top--];
 }
 
 bool FrameStack::isEmpty()
 {
-	if ( top == -1 )
+	if ( m_top == -1 )
 		return true;
 	else
 		return false;
@@ -49,13 +49,13 @@ bool FrameStack::isEmpty()
 
 bool FrameStack::isFull()
 {
-	if ( top == capacity )
+	if ( m_top == capacity )
 		return true;
 	else
 		return false;
 }
 
-Frame* FrameStack::getTop()
+Frame* FrameStack::top()
 {
-	return ppArray[top];
+	return ppArray[m_top];
 }

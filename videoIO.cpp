@@ -5,10 +5,12 @@
 #include "frame.h"
 #include "frameHeap.h"
 #include "frameQueue.h"
+#include "frameStack.h"
 
 VideoIO::VideoIO()
-	:frameIndex(0)
 {
+	frameIndex = 0;
+
 	//register all formats and codec
 	av_register_all();
 
@@ -143,7 +145,7 @@ int VideoIO::main(int argc, char *argv[])
 	openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 
 	///TODO : change to stack
-	pUnusedInputFrameStack = new FrameHeap(FRAME_LIMIT);
+	pUnusedInputFrameStack = new FrameStack(FRAME_LIMIT);
 	for(int i = 0 ; i < FRAME_LIMIT ; i++)
 	{
 		//assign appropriate parts of buffer to image planes in pFrameRGB
@@ -155,7 +157,7 @@ int VideoIO::main(int argc, char *argv[])
 	pInputFrameQueue = new FrameQueue(FRAME_LIMIT);
 	
 	//TODO : change to Stack
-	pUnusedOutputFrameStack = new FrameHeap(FRAME_LIMIT);
+	pUnusedOutputFrameStack = new FrameStack(FRAME_LIMIT);
 	
 	pOutputFrameHeap = new FrameHeap(FRAME_LIMIT);
 
@@ -180,7 +182,9 @@ int VideoIO::main(int argc, char *argv[])
 	}
 
 	for(int i = 0 ; i < FRAME_LIMIT ; i++)
+	{
 		writeFrame();
+	}
 	
 	return 0;
 }
