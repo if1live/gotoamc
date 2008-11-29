@@ -4,6 +4,7 @@
 #include "videoIO.h"
 #include "frame.h"
 #include "frameHeap.h"
+#include "frameQueue.h"
 
 VideoIO::VideoIO()
 	:frameIndex(0)
@@ -40,7 +41,7 @@ VideoIO::~VideoIO()
 	{
 		while(pInputFrameQueue->isEmpty() == false)
 		{
-			Frame *frame = pInputFrameQueue->top();
+			Frame *frame = pInputFrameQueue->front();
 			delete frame;
 			pInputFrameQueue->pop();
 		}
@@ -151,8 +152,9 @@ int VideoIO::main(int argc, char *argv[])
 		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 		pUnusedInputFrameStack->push(pInputFrame);
 	}
-	//TODO : change to Queue
-	pInputFrameQueue = new FrameHeap(FRAME_LIMIT);
+	pInputFrameQueue = new FrameQueue(FRAME_LIMIT);
+	
+	//TODO : change to Stack
 	pUnusedOutputFrameStack = new FrameHeap(FRAME_LIMIT);
 	
 	pOutputFrameHeap = new FrameHeap(FRAME_LIMIT);
@@ -167,7 +169,7 @@ int VideoIO::main(int argc, char *argv[])
 		Frame *frame;
 		try
 		{
-			frame = pInputFrameQueue->top();
+			frame = pInputFrameQueue->front();
 			pInputFrameQueue->pop();
 			pOutputFrameHeap->push(frame);
 		}

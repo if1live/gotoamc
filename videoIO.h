@@ -4,9 +4,7 @@
 extern "C" {
 #endif
 
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
+#include "libs.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -62,7 +60,7 @@ private:
 	struct SwsContext *pInputImgConvertCtx;
 
 	///TODO : change data struct
-	FrameHeap *pInputFrameQueue;	//save read frame from video
+	FrameQueue *pInputFrameQueue;	//save read frame from video
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video
 
 	///TODO : change to stack

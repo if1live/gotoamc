@@ -9,7 +9,7 @@ TARGET	= amc
 all: $(TARGET)
 	
 
-$(TARGET): frameHeap.o main.o frame.o videoIO.o
+$(TARGET): frameHeap.o frameQueue.o main.o frame.o videoIO.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(INC)
 
 main.o: main.cpp
@@ -19,6 +19,9 @@ frame.o: frame.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $^ $(LDFLAGS) $(INC)
 
 frameHeap.o: frameHeap.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $^ $(LDFLAGS) $(INC)
+
+frameQueue.o: frameQueue.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $^ $(LDFLAGS) $(INC)
 
 videoIO.o: videoIO.cpp

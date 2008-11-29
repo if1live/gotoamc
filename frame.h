@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
+// include required libs
+#include "libs.h"
 
 #ifdef __cplusplus
 }
