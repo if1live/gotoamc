@@ -5,19 +5,19 @@ stack::stack( int _capacity )
 {
 	capacity = _capacity;
 	top = -1;
-	ppArray = (Frame*) malloc( sizeof(Frame) * capacity );
+	ppArray = new Frame*[capacity];
 }
 
 stack::~stack(void)
 {
-	free(ppArray);
+	delete[] ppArray;
 }
 
 void stack::push( Frame* _pFrame )
 {
 	if ( isFull() == true )
 	{
-		Frame** newArray = (Frame*) malloc( sizeof(Frame) * capacity * 2);
+		Frame** newArray = new Frame*[capacity * 2];
 
 		for ( i = 0 ; i < capacity ; i++ )
 			newArray[i] = ppArray[i];
