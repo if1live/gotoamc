@@ -59,11 +59,9 @@ private:
 
 	struct SwsContext *pInputImgConvertCtx;
 
-	///TODO : change data struct
 	FrameQueue *pInputFrameQueue;	//save read frame from video
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video
 
-	///TODO : change to stack
 	FrameStack *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
 	FrameStack *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
 

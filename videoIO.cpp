@@ -144,7 +144,6 @@ int VideoIO::main(int argc, char *argv[])
 	char *outputFilename = argv[2];
 	openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 
-	///TODO : change to stack
 	pUnusedInputFrameStack = new FrameStack(FRAME_LIMIT);
 	for(int i = 0 ; i < FRAME_LIMIT ; i++)
 	{
@@ -156,7 +155,6 @@ int VideoIO::main(int argc, char *argv[])
 	}
 	pInputFrameQueue = new FrameQueue(FRAME_LIMIT);
 	
-	//TODO : change to Stack
 	pUnusedOutputFrameStack = new FrameStack(FRAME_LIMIT);
 	
 	pOutputFrameHeap = new FrameHeap(FRAME_LIMIT);

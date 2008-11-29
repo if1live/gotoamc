@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
+#include <string.h>
 #include "frameStack.h"
 
 FrameStack::FrameStack( int _capacity )
@@ -20,10 +20,11 @@ void FrameStack::push( Frame* _pFrame )
 	{
 		Frame** newArray = new Frame*[capacity * 2];
 
-		for ( int i = 0 ; i < capacity ; i++ )
-			newArray[i] = ppArray[i];
+		//for ( int i = 0 ; i < capacity ; i++ )
+		//	newArray[i] = ppArray[i];
+		memcpy(newArray, ppArray, sizeof(Frame*)*capacity);
 		
-		free(ppArray);
+		delete[] ppArray;
 		ppArray = newArray;
 		capacity = capacity * 2;
 	}
@@ -34,7 +35,7 @@ void FrameStack::push( Frame* _pFrame )
 Frame* FrameStack::pop()
 {
 	if ( isEmpty() == true )
-		return NULL;
+		return "stack pop error: stack is empty";
 	
 	return ppArray[m_top--];
 }
