@@ -13,6 +13,6 @@
 //#include <swscale.h>
 //#endif
 
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
+#include <avcodec.h>
+#include <avformat.h>
+#include <swscale.h>
