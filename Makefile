@@ -2,7 +2,7 @@ CC	= gcc
 CXX	= g++
 CXXFLAGS= -g -W -Wall
 LDFLAGS = -lavformat -lavcodec -lz -lm -lswscale
-INC	= -I/usr/include/libavcodec/ -I/usr/include/libavformat -I/usr/include/libswscale
+INC	= -I/usr/include/ffmpeg/
 
 TARGET	= amc
 
