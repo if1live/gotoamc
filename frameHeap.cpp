@@ -1,3 +1,4 @@
+#include <cstring>
 #include "frameHeap.h"
 #include "frame.h"
 
@@ -50,6 +51,8 @@ void FrameHeap::push(Frame *_pFrame)
 	{
 		//double the capacity
 		Frame **tmp = new Frame* [capacity*2 + 1];
+		memcpy(tmp, ppHeap, sizeof(Frame*) * capacity + 1);
+
 		delete[] ppHeap;
 		ppHeap = tmp;
 		
