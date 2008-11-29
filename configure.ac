@@ -12,9 +12,7 @@ AC_CHECK_LIB([avformat], [av_register_all])
 AC_CHECK_LIB([swscale], [sws_getContext])
 
 dnl 체크할 헤더파일
-AC_CHECK_HEADERS([libavcodec/avcodec.h], AC_MSG_RESULT([found]), AC_MSG_WARN([waring]), [/usr/include/ffmpeg])
-AC_CHECK_HEADERS([ffmpeg/libavformat/avformat.h])
-AC_CHECK_HEADERS([ffmpeg/libswscale/libswscale.h])
+AC_CHECK_HEADERS([avcodec.h avformat.h swscale.h])
 
 dnl 최종적으로 생성할 파일명
 AC_CONFIG_FILES([Makefile])
