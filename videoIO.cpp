@@ -435,38 +435,16 @@ bool VideoIO::openOutputCodec(char *_filename, int _width, int _height)
 }
 
 
-bool VideoIO::saveFrame(Frame *_pFrame, int _width, int _height, int _id)
+bool VideoIO::saveFrame(Frame *_pFrame)
 {
-	FILE *pFile;
 	char filename[32];
+
+	int id = _pFrame->getId();
 	
 	//open file
-	sprintf(filename, "frame%02d.ppm", _id);
-	pFile = fopen(filename, "wb");
-	if(pFile == NULL)
-	{
-		fprintf(stderr, "cannot write ppm file\n");
-		return false;
-	}
-	else
-	{
-		printf("write image : %s\n", filename);
-	}
-	
-	//write header
-	fprintf(pFile, "P6\n%d %d\n255\n", _width, _height);
+	sprintf(filename, "frame%02d.ppm", id);
 
-	//write pixel data
-	for(int y = 0 ; y < _height ; y++)
-	{
-		fwrite(_pFrame->getFrame()->data[0] + y*_pFrame->getFrame()->linesize[0],
-			   1, _width * 3, pFile);
-	}
-
-	//close file
-	fclose(pFile);
-
-	return true;
+	return _pFrame->saveP6PPM(filename);
 }
 
 void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)

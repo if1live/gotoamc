@@ -36,11 +36,15 @@ public:
 	AVFrame *getFrame(void);
 	int getWidth(void);
 	int getHeight(void);
-
+ 
 	int getRGB(int _x, int _y);
 	bool setGrey(int _x, int _y, unsigned char _value);
 	bool setBlack(int _x, int _y);
 	bool setWhite(int _x, int _y);
+
+	//only ppm support
+	bool openP3PPM(char *_filename);	//not tested
+	bool saveP6PPM(char *_filename);	//not tested
 
 private:
 	AVFrame *pFrame;

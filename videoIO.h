@@ -30,8 +30,7 @@ public:
 	int main(int argc, char *argv[]);	//thread's function
 	bool readFrame(void);	//read a frame from video then save to pFrame
 	bool writeFrame(void);	//write a frame
-	bool saveFrame(Frame *_pFrame, int _width, int _height, int _id);
-	
+	bool saveFrame(Frame *_pFrame);	
 	
 private:
 	//member function
