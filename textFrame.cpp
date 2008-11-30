@@ -1,4 +1,3 @@
-#define ENABLE_ANSI	// set this to enable ANSI extension
 #include "textFrame.h"
 #include <iostream>
 #define RMASK 0xff0000
@@ -10,31 +9,18 @@ TextFrame::TextFrame(Frame* _pFrame)
 	// get width and height
 	width = _pFrame->getWidth();
 	height = _pFrame->getHeight();
-	
+
+//	printf("iw:%d ih:%d\n", width, height);	
 	// set hardware params. for aalib
-	/*hParams.font = NULL; //default value
-
-	hParams.supported = AA_EXTENDED;
-
-	hParams.minwidth = width;
-	hParams.minheight = height;
-	hParams.maxwidth = width;
-	hParams.maxheight = height;
-	hParams.width = width;
-	hParams.height = height;
-	hParams.recwidth = width;
-	hParams.recheight = height;
-	*/
-
-	aa_savedata asv;
-	asv.name = "aaout";
-	asv.format = &aa_text_format;
-	asv.file = NULL;
+	aa_defparams.minwidth = this->width/2;
+	aa_defparams.minheight = this->height/2;
+	aa_defparams.maxwidth = this->width/2 - (this->width/2)%100 + 100;
+	aa_defparams.maxheight = this->width/2 - (this->width/2)%100 + 100;
 
 	// init context
-	context = aa_init(&mem_d, &aa_defparams, &asv);
+	c = aa_init(&mem_d, &aa_defparams, NULL);
 	
-	if(context == NULL)
+	if(c == NULL)
 		throw "Failed to initialize aalib";
 
 	// get RGB values from frame and put pixels with greyscale-converted value
@@ -43,32 +29,27 @@ TextFrame::TextFrame(Frame* _pFrame)
 		for(int j=0; j<height; j++)
 		{
 			int rgbValue = _pFrame->getRGB(i,j);
-			printf("i:%d j:%d r:%d g:%d b:%d grs:%d\n", i,j,(rgbValue&RMASK)>>16, (rgbValue&GMASK)>>8, (rgbValue&BMASK), (int)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
-			aa_putpixel(context, i, j,(unsigned char)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
+		//	printf("i:%d j:%d r:%d g:%d b:%d grs:%d\n", i,j,(rgbValue&RMASK)>>16, (rgbValue&GMASK)>>8, (rgbValue&BMASK), (int)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
+			aa_putpixel(c, i, j,(unsigned char)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
 		}
 	}
-	printf("##width %d height %d\n", width, height);
-	
 	// render into ascii art
-	textWidth = aa_scrwidth(context);	// text width
-	textHeight = aa_scrheight(context);	// text height
-	
-	printf("##POINT BEFORE RENDER: w %d h %d\n", textWidth, textHeight);
-	aa_render(context, &aa_defrenderparams, 0, 0, textWidth, textHeight);
-	printf("###RENDER DONE\n");
-	aa_flush(context);
+	textWidth = aa_scrwidth(c);	// text width
+	textHeight = aa_scrheight(c);	// text height
+	aa_render(c, &aa_defrenderparams, 0, 0, textWidth, textHeight);
+	aa_flush(c);
 
-	aadata = aa_text(context);
+	aadata = aa_text(c);
 }
 
 TextFrame::~TextFrame()
 {
-	if(context != NULL)
+	if(c != NULL)
 	{
-		aa_close(context);
-		//context = NULL;
+		aa_close(c);
+		c = NULL;
 	}
-	//aadata = NULL;
+	aadata = NULL;
 }
 
 int TextFrame::getWidth(void)
@@ -86,6 +67,11 @@ int TextFrame::getTextWidth(void)
 int TextFrame::getTextHeight(void)
 {
 	return this->textHeight;
+}
+
+unsigned char* TextFrame::getText(void)
+{
+	return this->aadata;
 }
 
 void TextFrame::print(void) // for debugging purpose
