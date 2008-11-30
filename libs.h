@@ -15,4 +15,3 @@
 
 #include <avcodec.h>
 #include <avformat.h>
-#include <swscale.h>

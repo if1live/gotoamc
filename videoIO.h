@@ -41,6 +41,7 @@ private:
 	bool openOutputCodec(char *_filename, int _width, int _height);
 
 	void RGB24ToYUV420P(AVFrame *_src, int _width, int _height);
+	void YUV420PToRGB24(AVFrame *_dst, int _width, int _height);
 
 	//member variable
 	AVFormatContext *pFormatCtx;
@@ -56,8 +57,6 @@ private:
 	int frameIndex;	//id of frame
 	int videoStream;
 	int frameFinished;
-
-	struct SwsContext *pInputImgConvertCtx;
 
 	FrameQueue *pInputFrameQueue;	//save read frame from video
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video

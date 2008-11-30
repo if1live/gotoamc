@@ -11,6 +11,9 @@ VideoIO::VideoIO()
 {
 	frameIndex = 0;
 
+	//must be called before using avcodec lib
+	avcodec_init();
+
 	//register all formats and codec
 	av_register_all();
 
@@ -27,7 +30,11 @@ VideoIO::VideoIO()
 	pUnusedInputFrameStack = NULL;
 	pUnusedOutputFrameStack = NULL;
 
-	pInputImgConvertCtx = NULL;
+	pInputCodecCtx = NULL;
+	pInputCodec = NULL;
+	pOutputCodecCtx = NULL;
+	pOutputCodec = NULL;
+	pFormatCtx = NULL;
 
 	//set variable
 	outSize = -1;
@@ -83,12 +90,6 @@ VideoIO::~VideoIO()
 		delete pUnusedOutputFrameStack;
 	}
 	
-	//delete img convert
-	if(pInputImgConvertCtx != NULL)
-	{
-		sws_freeContext(pInputImgConvertCtx);
-	}
-
 	//close output video
 	if(outSize != -1)
 	{
@@ -110,27 +111,41 @@ VideoIO::~VideoIO()
 	}
 
 	//free the rgb image
-	av_free(pInputFrame);
+	if(pInputFrame != NULL)
+		av_free(pInputFrame);
 
-	free(pOutputFrame->data[0]);
-	av_free(pOutputFrame);
+	if(pOutputFrame != NULL)
+	{
+		free(pOutputFrame->data[0]);
+		av_free(pOutputFrame);
+	}
 
 	//close the codec
-	avcodec_close(pOutputCodecCtx);
-	avcodec_close(pInputCodecCtx);
+	if(pOutputCodecCtx != NULL)
+	{
+		avcodec_close(pOutputCodecCtx);
+		av_free(pOutputCodecCtx);
+		fclose(pOutputFile);		//output video
+	}
 
-	av_free(pOutputCodecCtx);
+	if(pInputCodecCtx != NULL)
+	{
+		avcodec_close(pInputCodecCtx);
+	}
 	
 	//close input video
-	av_close_input_file(pFormatCtx);
-
-	free(pOutBuffer);
-
-	fclose(pOutputFile);		//output video
+	if(pFormatCtx != NULL)
+	{
+		av_close_input_file(pFormatCtx);
+	}
+	
+	if(pOutBuffer != NULL)
+		free(pOutBuffer);
 }
 
 int VideoIO::main(int argc, char *argv[])
 {
+
 	if(validateArg(argc, argv) == false)
 		exit(EXIT_FAILURE);;	//quit program
 
@@ -160,7 +175,6 @@ int VideoIO::main(int argc, char *argv[])
 	pOutputFrameHeap = new FrameHeap(FRAME_LIMIT);
 
 	//read frame
-
 	for(int i = 0 ; i < FRAME_LIMIT ; i++)
 		readFrame();
 
@@ -183,7 +197,7 @@ int VideoIO::main(int argc, char *argv[])
 	{
 		writeFrame();
 	}
-	
+
 	return 0;
 }
 
@@ -250,6 +264,7 @@ bool VideoIO::validateArg(int argc, char *argv[])
 bool VideoIO::openInputCodec(char *_filename)
 {
 	//open video file
+	///TODO : 20byte lost
 	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL) != 0)
 	{
 		fprintf(stderr, "couldn't open file\n");
@@ -328,28 +343,12 @@ bool VideoIO::readFrame(void)
 									 packet.data, packet.size);
 				
 				//did we get a frame?
+				
 				if(frameFinished)
 				{
 					int w = pInputCodecCtx->width;
 					int h = pInputCodecCtx->height;
 					
-					if(pInputImgConvertCtx == NULL)
-					{
-						//prepare to convert from YUV402P to RGB24
-						int pix_fmt = pInputCodecCtx->pix_fmt;
-						int dst_pix_fmt = PIX_FMT_RGB24;
-						
-						pInputImgConvertCtx = sws_getContext(w, h, pix_fmt, 
-															 w, h, dst_pix_fmt, SWS_BICUBIC,
-															 NULL, NULL, NULL);
-						if(pInputImgConvertCtx == NULL)
-						{
-							fprintf(stderr, "Can't use Sws Convert!!\n");
-							exit(EXIT_FAILURE);
-						}
-					}
-					
-					//get unused frame
 					Frame *frame = NULL;
 					try
 					{
@@ -362,8 +361,7 @@ bool VideoIO::readFrame(void)
 					}
 
 					//convert YUV420P->RGB24
-					sws_scale(pInputImgConvertCtx, pInputFrame->data, pInputFrame->linesize, 0, h,
-							  frame->getFrame()->data, frame->getFrame()->linesize);
+					YUV420PToRGB24(frame->getFrame(), w, h);
 					
 					frame->setId(frameIndex);
 					
@@ -371,9 +369,9 @@ bool VideoIO::readFrame(void)
 					
 					//complete read a frame, then push to queue
 					pInputFrameQueue->push(frame);
-					
+										
 					incFrameIndex();
-					
+								
 					readSuccess = true;
 				}
 				else
@@ -382,6 +380,7 @@ bool VideoIO::readFrame(void)
 					readComplete = true;
 				}
 			}
+				
 			//free the packet that was allocated by av_read_frame
 			av_free_packet(&packet);
 		}
@@ -502,6 +501,38 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 			
 			pOutputFrame->data[1][y * pOutputFrame->linesize[1] + x] = resultCr;
 			pOutputFrame->data[2][y * pOutputFrame->linesize[2] + x] = resultCb;
+		}
+	}
+}
+
+
+void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
+{
+	//convert YUV420P(pInputFrame..class member variable) to RGB24(_dst)
+	int w = _width;
+	int h = _height;
+	int size = w * h;
+
+	for(int y = 0 ; y < h ; y++)
+	{
+		for(int x = 0 ; x < w ; x++)
+		{
+			//get Cr, Cb
+			uint8_t yuvCr = pInputFrame->data[1][y/2 * pInputFrame->linesize[1] + x/2];
+			uint8_t yuvCb = pInputFrame->data[2][y/2 * pInputFrame->linesize[2] + x/2];
+			
+			//get Y
+			uint8_t yuvY = pInputFrame->data[0][y * pInputFrame->linesize[0] + x];
+			
+			//calculate rgb
+			uint8_t r = yuvY + (1.140*yuvCb);
+			uint8_t g = yuvY - (0.395*yuvCr) - (0.581*yuvCb);
+			uint8_t b = yuvY + (2.032*yuvCr);
+
+			//assign rgb
+			*(_dst->data[0] + y*_dst->linesize[0] + (3*x)) = r;
+			*(_dst->data[0] + y*_dst->linesize[0] + (3*x + 1)) = g;
+			*(_dst->data[0] + y*_dst->linesize[0] + (3*x + 2)) = b;
 		}
 	}
 }
