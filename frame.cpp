@@ -56,6 +56,12 @@ Frame::Frame(AVCodecContext *_pCodecCtx, int _type)
 	}
 }
 
+Frame::Frame(int _width, int _height, int _id)
+{
+	id = _id;
+	setBlankFrame(_width, _height);
+}
+
 Frame::~Frame()
 {
 	if(buffer != NULL)
@@ -66,6 +72,41 @@ Frame::~Frame()
 		av_free(pFrame);
 }
 
+void Frame::setBlankFrame(int _width, int _height)
+{
+	//if already pFrame exist, delete it
+	if(buffer != NULL)
+		free(buffer);
+
+	//free the frame
+	if(pFrame != NULL)
+		av_free(pFrame);
+
+	try
+	{
+		pFrame = NULL;
+
+		//allocate an AVFrame structure
+		pFrame = avcodec_alloc_frame();
+		if(pFrame == NULL)
+			throw "cannot allocate frame";
+
+		//create P6 PPM blank Image
+		int type = PIX_FMT_RGB24;
+
+		//determine required buffer size and allocate buffer
+		int numBytes = avpicture_get_size(type, _width, _height);
+		buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
+
+		//assign appropriate parts of buffer to image planes in pFrame
+		//not that pFrame is an AVFrame, but AVFrame is a superset of AVPicture
+		avpicture_fill((AVPicture *)pFrame, buffer, type, _width, _height);
+	}
+	catch(char *msg)
+	{
+		cout << msg;
+	}
+}
 
 int Frame::getId(void)
 {

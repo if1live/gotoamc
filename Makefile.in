@@ -163,10 +163,11 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 amc_SOURCES = main.cpp frame.cpp frameHeap.cpp frameQueue.cpp frameStack.cpp videoIO.cpp
-amc_CXXFLAGS = -lz -lavutil -lm @CXXFLAGS@ -lavutil -I/usr/include/ffmpeg -I/usr/include/ffmpeg/avcodec -I/usr/include/ffmpeg/libavformat -I/usr/include/libavcodec/ -I/usr/include/libavformat 
+amc_CXXFLAGS = -lz -lavutil -lm @CXXFLAGS@ -lavutil -I/usr/include/ffmpeg -I/usr/include/ffmpeg/libavcodec -I/usr/include/ffmpeg/libavformat -I/usr/include/libavcodec/ -I/usr/include/libavformat 
 all: all-am
 
 .SUFFIXES:

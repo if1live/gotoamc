@@ -18,12 +18,15 @@ public:
 	Frame();
 	Frame(AVCodecContext *_pCodecCtx, int _type);
 	Frame(int _id);
+	Frame(int _width, int _height, int _id);
 
 	//dtor
 	~Frame();
 
 	int getId(void);
 	void setId(int _id);
+
+	void setBlankFrame(int _width, int _height);
 
 	//operator overloading
 	bool operator>(const Frame &_frame);
