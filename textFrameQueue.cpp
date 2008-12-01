@@ -43,7 +43,7 @@ TextFrame* TextFrameQueue::rear(void)
 	return ppQueue[mRear];
 }
 
-void TextFrameQueue::push(Frame *_pTextFrame)
+void TextFrameQueue::push(TextFrame *_pTextFrame)
 {
 	if(isFull())	// full? then double the capacity
 	{

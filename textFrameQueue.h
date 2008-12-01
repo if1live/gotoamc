@@ -15,7 +15,7 @@ public:
 	bool isFull(void);
 	TextFrame *front(void);
 	TextFrame *rear(void);
-	void push(Frame *_pTextFrame);
+	void push(TextFrame *_pTextFrame);
 	TextFrame *pop(void);
 
 private:
