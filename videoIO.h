@@ -15,6 +15,7 @@ class Frame;
 class FrameHeap;
 class FrameQueue;
 class FrameStack;
+class Context;
 
 class VideoIO
 {
@@ -30,13 +31,6 @@ public:
 	bool writeFrame(void);	//write a frame
 	bool saveFrame(Frame *_pFrame);	
 
-	FrameQueue *getInputFrameQueue(void);	//save read frame from video
-	FrameHeap *getOutputFrameHeap(void);	//save writing frame to video
-
-	FrameStack *getUnusedInputFrameStack(void);	//available frame(use this then push to pInputQueue)
-	FrameStack *getUnusedOutputFrameStack(void);	//available frame(use pOutputHeap then push to this)
-
-	
 private:
 	//member function
 	int getFrameIndex(void);
@@ -71,7 +65,7 @@ private:
 	FrameStack *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
 	FrameStack *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
 
-	//this is test code
+	Context *pContext;
 	AVFrame *pInputFrame;
 	AVFrame *pOutputFrame;
 

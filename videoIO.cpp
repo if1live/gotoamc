@@ -6,6 +6,7 @@
 #include "frameHeap.h"
 #include "frameQueue.h"
 #include "frameStack.h"
+#include "context.h"
 
 VideoIO::VideoIO()
 {
@@ -25,10 +26,18 @@ VideoIO::VideoIO()
 	continueReadFrame = true;
 
 	//set pointer to null
-	pInputFrameQueue = NULL;
-	pOutputFrameHeap = NULL;
-	pUnusedInputFrameStack = NULL;
-	pUnusedOutputFrameStack = NULL;
+//	pInputFrameQueue = NULL;
+//	pOutputFrameHeap = NULL;
+//	pUnusedInputFrameStack = NULL;
+//	pUnusedOutputFrameStack = NULL;
+
+	pContext = Context::instance();	//get Context class
+
+	pUnusedInputFrameStack = pContext->getUnusedInputFrameStack();
+	pInputFrameQueue = pContext->getInputFrameQueue();
+	pUnusedOutputFrameStack = pContext->getUnusedOutputFrameStack();
+	pOutputFrameHeap = pContext->getOutputFrameHeap();
+
 
 	pInputCodecCtx = NULL;
 	pInputCodec = NULL;
@@ -41,55 +50,11 @@ VideoIO::VideoIO()
 	pOutBuffer = NULL;
 	outBufferSize = -1;
 	readComplete = false;
+
 }
 
 VideoIO::~VideoIO()
 {
-	//delete data struct
-	if(pInputFrameQueue != NULL)
-	{
-		while(pInputFrameQueue->isEmpty() == false)
-		{
-			Frame *frame = pInputFrameQueue->front();
-			delete frame;
-			pInputFrameQueue->pop();
-		}
-		delete pInputFrameQueue;
-	}
-
-	if(pOutputFrameHeap != NULL)
-	{
-		while(pOutputFrameHeap->isEmpty() == false)
-		{
-			Frame *frame = pOutputFrameHeap->top();
-			delete frame;
-			pOutputFrameHeap->pop();
-		}
-		delete pOutputFrameHeap;
-	}
-
-	if(pUnusedInputFrameStack != NULL)
-	{
-		while(pUnusedInputFrameStack->isEmpty() == false)
-		{
-			Frame *frame = pUnusedInputFrameStack->top();
-			delete frame;
-			pUnusedInputFrameStack->pop();
-		}
-		delete pUnusedInputFrameStack;
-	}
-
-	if(pUnusedOutputFrameStack != NULL)
-	{
-		while(pUnusedOutputFrameStack->isEmpty() == false)
-		{
-			Frame *frame = pUnusedOutputFrameStack->top();
-			delete frame;
-			pUnusedOutputFrameStack->pop();
-		}
-		delete pUnusedOutputFrameStack;
-	}
-	
 	//close output video
 	if(outSize != -1)
 	{
@@ -145,7 +110,8 @@ VideoIO::~VideoIO()
 
 int VideoIO::main(int argc, char *argv[])
 {
-
+	int frameLimit = pContext->getFrameLimit();
+	
 	if(validateArg(argc, argv) == false)
 		exit(EXIT_FAILURE);;	//quit program
 
@@ -159,8 +125,7 @@ int VideoIO::main(int argc, char *argv[])
 	char *outputFilename = argv[2];
 	openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 
-	pUnusedInputFrameStack = new FrameStack(FRAME_LIMIT);
-	for(int i = 0 ; i < FRAME_LIMIT ; i++)
+	for(int i = 0 ; i < frameLimit ; i++)
 	{
 		//assign appropriate parts of buffer to image planes in pFrameRGB
 		//note that pFrameRGB is an AVFrame, bug AVFrame is a superset of AVPicture
@@ -168,17 +133,12 @@ int VideoIO::main(int argc, char *argv[])
 		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 		pUnusedInputFrameStack->push(pInputFrame);
 	}
-	pInputFrameQueue = new FrameQueue(FRAME_LIMIT);
-	
-	pUnusedOutputFrameStack = new FrameStack(FRAME_LIMIT);
-	
-	pOutputFrameHeap = new FrameHeap(FRAME_LIMIT);
 
 	//read frame
-	for(int i = 0 ; i < FRAME_LIMIT ; i++)
+	for(int i = 0 ; i < frameLimit ; i++)
 		readFrame();
 
-	for(int i = 0 ; i < FRAME_LIMIT ; i++)
+	for(int i = 0 ; i < frameLimit ; i++)
 	{
 		Frame *frame;
 		try
@@ -193,7 +153,7 @@ int VideoIO::main(int argc, char *argv[])
 		}
 	}
 
-	for(int i = 0 ; i < FRAME_LIMIT ; i++)
+	for(int i = 0 ; i < frameLimit ; i++)
 	{
 		writeFrame();
 	}
@@ -538,25 +498,3 @@ void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
 }
 
 
-FrameQueue *VideoIO::getInputFrameQueue(void)
-{
-	return pInputFrameQueue;
-}
-
-
-FrameHeap *VideoIO::getOutputFrameHeap(void)
-{
-	return pOutputFrameHeap;
-}
-
-
-FrameStack *VideoIO::getUnusedInputFrameStack(void)
-{
-	return pUnusedInputFrameStack;
-}
-
-
-FrameStack *VideoIO::getUnusedOutputFrameStack(void)
-{
-	return pUnusedOutputFrameStack;
-}

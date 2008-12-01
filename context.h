@@ -1,4 +1,4 @@
-#pragm once
+#pragma once
 
 class FrameHeap;
 class FrameQueue;
@@ -19,6 +19,7 @@ public:
 	FrameStack *getUnusedInputFrameStack(void);
 	FrameStack *getUnusedOutputFrameStack(void);
 
+	int getFrameLimit(void);
 private:
 	//ctor
 	Context();
@@ -26,7 +27,7 @@ private:
 	static Context *context;
 
 	FrameHeap *pOutputFrameHeap;
-	FrameQueue *pInoutFrameQueue;
+	FrameQueue *pInputFrameQueue;
 	FrameStack *pUnusedInputFrameStack;
 	FrameStack *pUnusedOutputFrameStack;
 
