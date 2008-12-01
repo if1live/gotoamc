@@ -9,8 +9,10 @@ int main(int argc, char *argv[])
 	delete videoIO;
 */
 
-	VideoIO videoIO;
+/*	VideoIO videoIO;
 	videoIO.main(argc, argv);
+*/
+    TextFrame2PPM test;
 	
 	return 0;
 }
