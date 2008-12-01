@@ -2,7 +2,7 @@
 #include "textFrame.h"
 #include "constNum.h"
 
-class TextFrame2PPM
+/*class TextFrame2PPM
 {
 public :
     TextFrame2PPM();
@@ -13,5 +13,19 @@ public :
   
 private :
     Frame* fonts[MAX_OF_FONTS];
+
+    };*/
+
+class TextFrame2PPM
+{
+ public :
+  TextFrame2PPM();
+  void Convert();
+
+
+  ~TextFrame2PPM();
+
+ private :
+  Frame *fonts[MAX_OF_FONTS];
 
 };

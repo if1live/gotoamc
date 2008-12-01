@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "videoIO.h"
+#include "textFrame2PPM.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,7 @@ int main(int argc, char *argv[])
 	videoIO.main(argc, argv);
 */
     TextFrame2PPM test;
+    test.Convert();
 	
 	return 0;
 }

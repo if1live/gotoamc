@@ -46,8 +46,9 @@ public:
 	bool setWhite(int _x, int _y);
 
 	//only ppm support
-	bool openP3PPM(char *_filename);	//not tested
-	bool saveP6PPM(char *_filename);	//not tested
+	bool openP3PPM(char *_filename);
+	bool saveP3PPM(char *_filename);
+	bool saveP6PPM(char *_filename);
 
 private:
 	AVFrame *pFrame;

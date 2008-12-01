@@ -94,6 +94,9 @@ void Frame::setBlankFrame(int _width, int _height)
 		//create P6 PPM blank Image
 		int type = PIX_FMT_RGB24;
 
+		width = _width;
+		height = _height;
+
 		//determine required buffer size and allocate buffer
 		int numBytes = avpicture_get_size(type, _width, _height);
 		buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
@@ -319,6 +322,48 @@ bool Frame::saveP6PPM(char *_filename)
 	for(int y = 0 ; y < height ; y++)
 	{
 		fwrite(pFrame->data[0] + y*pFrame->linesize[0], 1, width * 3, pFile);
+	}
+
+	//close file
+	fclose(pFile);
+
+	return true;
+}
+
+bool Frame::saveP3PPM(char *_filename)
+{
+	//if frame not defined, return false(error code)
+	if(width == -1 || height == -1)
+		return false;
+
+	//open file
+	FILE *pFile = fopen(_filename, "wb");
+	if(pFile == NULL)
+	{
+		fprintf(stderr, "cannot write ppm file\n");
+		return false;
+	}
+	else
+	{
+		printf("write image : %s\n", _filename);
+	}
+	
+	//write header
+	fprintf(pFile, "P3\n%d %d\n255\n", width, height);
+
+	//write pixel data
+	for(int y = 0 ; y < height ; y++)
+	{
+		for(int x = 0 ; x < width ; x++)
+		{
+			int rgb = getRGB(x, y);
+			
+			unsigned char r = (0x00ff0000 & rgb) >> 16;
+			unsigned char g = (0x0000ff00 & rgb) >> 8;
+			unsigned char b = (0x000000ff & rgb);
+			
+			fprintf(pFile, "%d %d %d\n", r, g, b);
+		}
 	}
 
 	//close file
