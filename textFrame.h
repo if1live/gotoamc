@@ -2,6 +2,9 @@
 #include "frame.h"
 #include <aalib.h>
 
+class FrameQueue;
+class FrameStack;
+
 class TextFrame
 {
 public:
@@ -14,6 +17,11 @@ public:
 	unsigned char* getText(void);	// get text!
 	void print(void);	// for debugging purpose
 
+	void setInputFrameQueue(FrameQueue *_ptr);
+	void setUnusedInputFrameStack(FrameStack *_ptr);
+	
+	int main(void);	//entry point
+
 	//dtor
 	~TextFrame();
 private:
@@ -24,4 +32,11 @@ private:
 	int height;	//height of original frame
 	int textWidth;		// aa width
 	int textHeight;		// aa height
+
+	//communicate with VideoIO
+	FrameQueue *pInputFrameQueue;
+	FrameStack *pUnusedInputFrameStack;
+
+	//TODO : communicate with (textFrame(ascii) -> frame(image))
+	//
 };

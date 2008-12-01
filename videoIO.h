@@ -29,6 +29,13 @@ public:
 	bool readFrame(void);	//read a frame from video then save to pFrame
 	bool writeFrame(void);	//write a frame
 	bool saveFrame(Frame *_pFrame);	
+
+	FrameQueue *getInputFrameQueue(void);	//save read frame from video
+	FrameHeap *getOutputFrameHeap(void);	//save writing frame to video
+
+	FrameStack *getUnusedInputFrameStack(void);	//available frame(use this then push to pInputQueue)
+	FrameStack *getUnusedOutputFrameStack(void);	//available frame(use pOutputHeap then push to this)
+
 	
 private:
 	//member function

@@ -38,7 +38,7 @@ TextFrame::TextFrame(Frame* _pFrame)
 	textHeight = aa_scrheight(c);	// text height
 	aa_render(c, &aa_defrenderparams, 0, 0, textWidth, textHeight);
 	aa_flush(c);
-
+	
 	aadata = aa_text(c);
 }
 
@@ -78,4 +78,22 @@ void TextFrame::print(void) // for debugging purpose
 {
 	std::cout << aadata << std::endl;
 	std::cout << "TextWidth: " << textWidth << "TextHeight: " << textHeight << std::endl;
+}
+
+int TextFrame::main(void)
+{
+	///TODO : entry point
+	return 0;
+}
+
+
+void TextFrame::setInputFrameQueue(FrameQueue *_ptr)
+{
+	pInputFrameQueue = _ptr;
+}
+
+
+void TextFrame::setUnusedInputFrameStack(FrameStack *_ptr)
+{
+	pUnusedInputFrameStack = _ptr;
 }

@@ -536,3 +536,27 @@ void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
 		}
 	}
 }
+
+
+FrameQueue *VideoIO::getInputFrameQueue(void)
+{
+	return pInputFrameQueue;
+}
+
+
+FrameHeap *VideoIO::getOutputFrameHeap(void)
+{
+	return pOutputFrameHeap;
+}
+
+
+FrameStack *VideoIO::getUnusedInputFrameStack(void)
+{
+	return pUnusedInputFrameStack;
+}
+
+
+FrameStack *VideoIO::getUnusedOutputFrameStack(void)
+{
+	return pUnusedOutputFrameStack;
+}

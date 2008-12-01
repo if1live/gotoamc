@@ -275,7 +275,7 @@ bool Frame::openP3PPM(char *_filename)
 			fscanf(pFile, "%d", &intG);
 			fscanf(pFile, "%d", &intB);
 
-			unsigned char r = (unsigned char) intR;
+   			unsigned char r = (unsigned char) intR;
 			unsigned char g = (unsigned char) intG;
 			unsigned char b = (unsigned char) intB;
 
