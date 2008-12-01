@@ -48,7 +48,8 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_amc_OBJECTS = amc-main.$(OBJEXT) amc-frame.$(OBJEXT) \
 	amc-frameHeap.$(OBJEXT) amc-frameQueue.$(OBJEXT) \
-	amc-frameStack.$(OBJEXT) amc-videoIO.$(OBJEXT)
+	amc-frameStack.$(OBJEXT) amc-videoIO.$(OBJEXT) \
+	amc-textFrame.$(OBJEXT) amc-textFrameQueue.$(OBJEXT)
 amc_OBJECTS = $(am_amc_OBJECTS)
 amc_LDADD = $(LDADD)
 amc_LINK = $(CXXLD) $(amc_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -166,7 +167,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-amc_SOURCES = main.cpp frame.cpp frameHeap.cpp frameQueue.cpp frameStack.cpp videoIO.cpp
+amc_SOURCES = main.cpp frame.cpp frameHeap.cpp frameQueue.cpp frameStack.cpp videoIO.cpp textFrame.cpp textFrameQueue.cpp
 amc_CXXFLAGS = -lz -lavutil -lm @CXXFLAGS@ -lavutil -I/usr/include/ffmpeg -I/usr/include/ffmpeg/libavcodec -I/usr/include/ffmpeg/libavformat -I/usr/include/libavcodec/ -I/usr/include/libavformat 
 all: all-am
 
@@ -243,6 +244,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-frameQueue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-frameStack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-textFrame.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-textFrameQueue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amc-videoIO.Po@am__quote@
 
 .cpp.o:
@@ -342,6 +345,34 @@ amc-videoIO.obj: videoIO.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='videoIO.cpp' object='amc-videoIO.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -c -o amc-videoIO.obj `if test -f 'videoIO.cpp'; then $(CYGPATH_W) 'videoIO.cpp'; else $(CYGPATH_W) '$(srcdir)/videoIO.cpp'; fi`
+
+amc-textFrame.o: textFrame.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -MT amc-textFrame.o -MD -MP -MF $(DEPDIR)/amc-textFrame.Tpo -c -o amc-textFrame.o `test -f 'textFrame.cpp' || echo '$(srcdir)/'`textFrame.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/amc-textFrame.Tpo $(DEPDIR)/amc-textFrame.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='textFrame.cpp' object='amc-textFrame.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -c -o amc-textFrame.o `test -f 'textFrame.cpp' || echo '$(srcdir)/'`textFrame.cpp
+
+amc-textFrame.obj: textFrame.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -MT amc-textFrame.obj -MD -MP -MF $(DEPDIR)/amc-textFrame.Tpo -c -o amc-textFrame.obj `if test -f 'textFrame.cpp'; then $(CYGPATH_W) 'textFrame.cpp'; else $(CYGPATH_W) '$(srcdir)/textFrame.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/amc-textFrame.Tpo $(DEPDIR)/amc-textFrame.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='textFrame.cpp' object='amc-textFrame.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -c -o amc-textFrame.obj `if test -f 'textFrame.cpp'; then $(CYGPATH_W) 'textFrame.cpp'; else $(CYGPATH_W) '$(srcdir)/textFrame.cpp'; fi`
+
+amc-textFrameQueue.o: textFrameQueue.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -MT amc-textFrameQueue.o -MD -MP -MF $(DEPDIR)/amc-textFrameQueue.Tpo -c -o amc-textFrameQueue.o `test -f 'textFrameQueue.cpp' || echo '$(srcdir)/'`textFrameQueue.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/amc-textFrameQueue.Tpo $(DEPDIR)/amc-textFrameQueue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='textFrameQueue.cpp' object='amc-textFrameQueue.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -c -o amc-textFrameQueue.o `test -f 'textFrameQueue.cpp' || echo '$(srcdir)/'`textFrameQueue.cpp
+
+amc-textFrameQueue.obj: textFrameQueue.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -MT amc-textFrameQueue.obj -MD -MP -MF $(DEPDIR)/amc-textFrameQueue.Tpo -c -o amc-textFrameQueue.obj `if test -f 'textFrameQueue.cpp'; then $(CYGPATH_W) 'textFrameQueue.cpp'; else $(CYGPATH_W) '$(srcdir)/textFrameQueue.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/amc-textFrameQueue.Tpo $(DEPDIR)/amc-textFrameQueue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='textFrameQueue.cpp' object='amc-textFrameQueue.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(amc_CXXFLAGS) $(CXXFLAGS) -c -o amc-textFrameQueue.obj `if test -f 'textFrameQueue.cpp'; then $(CYGPATH_W) 'textFrameQueue.cpp'; else $(CYGPATH_W) '$(srcdir)/textFrameQueue.cpp'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

@@ -9,6 +9,7 @@ AC_PROG_CXXCPP
 dnl 체크할 라이브러리
 AC_CHECK_LIB([avcodec], [avcodec_alloc_context])
 AC_CHECK_LIB([avformat], [av_register_all])
+AC_CHECK_LIB([aa], [aa_init])
 
 dnl 체크할 헤더파일
 AC_CHECK_HEADERS([avcodec.h avformat.h])

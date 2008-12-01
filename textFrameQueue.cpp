@@ -1,6 +1,6 @@
 #include <string.h>	// for memcpy
-#include "Textframe.h"
-#include "TextframeQueue.h"
+#include "textFrame.h"
+#include "textFrameQueue.h"
 
 TextFrameQueue::TextFrameQueue(int _capacity)
 {
