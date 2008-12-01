@@ -3,6 +3,8 @@
 #include "frameHeap.h"
 #include "frameQueue.h"
 #include "frameStack.h"
+#include "textFrameStack.h"
+#include "textFrameQueue.h"
 #include "frame.h"
 
 Context::Context()
@@ -12,6 +14,8 @@ Context::Context()
 	pInputFrameQueue = new FrameQueue(frameLimit);
 	pUnusedInputFrameStack = new FrameStack(frameLimit);
 	pUnusedOutputFrameStack = new FrameStack(frameLimit);
+	pTextFrameQueue = new TextFrameQueue(frameLimit);
+	pUnusedTextFrameStack = new TextFrameStack(frameLimit);
 }
 
 Context::~Context()
@@ -63,6 +67,30 @@ Context::~Context()
 		delete pUnusedOutputFrameStack;
 		pUnusedOutputFrameStack = NULL;
 	}
+	
+	if(pTextFrameQueue != NULL)
+	{
+		while(pTextFrameQueue->isEmpty() == false)
+		{
+			TextFrame *frame = pTextFrameQueue->front();
+			delete frame;
+			pTextFrameQueue->pop();
+		}
+		delete pTextFrameQueue;
+		pTextFrameQueue = NULL;
+	}
+
+	if(pUnusedTextFrameStack != NULL)
+	{
+		while(pUnusedTextFrameStack->isEmpty() == false)
+		{
+			TextFrame *frame = pUnusedTextFrameStack->top();
+			delete frame;
+			pUnuesdTextFrameStack->pop();
+		}
+		delete pUnusedTextFrameStack;
+		pUnusedTextFrameStack = NULL;
+	}
 }
 
 
@@ -100,4 +128,14 @@ FrameStack *Context::getUnusedOutputFrameStack(void)
 int Context::getFrameLimit(void)
 {
 	return frameLimit;
+}
+
+TextFrameQueue *Context::getTextFrameQueue(void)
+{
+	return pTextFrameQueue;
+}
+
+TextFrameStack *Context::getUnusedTextFrameStack(void)
+{
+	return pUnusedTextFrameStack;
 }

@@ -30,6 +30,7 @@ public:
 	bool readFrame(void);	//read a frame from video then save to pFrame
 	bool writeFrame(void);	//write a frame
 	bool saveFrame(Frame *_pFrame);	
+	bool isReadingComplete(void);
 
 private:
 	//member function

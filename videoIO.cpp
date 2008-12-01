@@ -133,12 +133,13 @@ int VideoIO::main(int argc, char *argv[])
 		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 		pUnusedInputFrameStack->push(pInputFrame);
 	}
-
+	
+	
 	//read frame
-	for(int i = 0 ; i < frameLimit ; i++)
+	for(int i = 0 ; i < frameLimit && isReadingComplete() == false; i++)
 		readFrame();
-
-	for(int i = 0 ; i < frameLimit ; i++)
+	
+	while(pInputFrameQueue->isEmpty() == false)
 	{
 		Frame *frame;
 		try
@@ -152,12 +153,12 @@ int VideoIO::main(int argc, char *argv[])
 			fprintf(stderr, "[Except]%s", msg);
 		}
 	}
-
-	for(int i = 0 ; i < frameLimit ; i++)
+	
+	while(pOutputFrameHeap->isEmpty() == false)
 	{
 		writeFrame();
 	}
-
+	
 	return 0;
 }
 
@@ -167,18 +168,17 @@ bool VideoIO::writeFrame(void)
 	int h = pOutputCodecCtx->height;
 	
 	//get frame
-	Frame *frame;
-	try
+	Frame *frame = NULL;
+	while(frame == NULL)
 	{
-		frame = pOutputFrameHeap->top();
-		pOutputFrameHeap->pop();
+		if(pOutputFrameHeap->isEmpty() == false)
+		{
+			frame = pOutputFrameHeap->top();
+			pOutputFrameHeap->pop();
+			break;	//get output frame : success
+		}
 	}
-	catch(const char *msg)
-	{
-		fprintf(stderr, "[Except]%s\n", msg);
-		return false;
-	}
-
+	
 	//convert RGB24->YUV402P
 	RGB24ToYUV420P(frame->getFrame(), w, h);
 
@@ -290,7 +290,7 @@ bool VideoIO::readFrame(void)
 
 	//else...continue read frame from video
 	bool readSuccess = false;
-
+	
 	while(readSuccess != true && readComplete == false)
 	{
 		if(av_read_frame(pFormatCtx, &packet) >= 0)
@@ -310,15 +310,16 @@ bool VideoIO::readFrame(void)
 					int h = pInputCodecCtx->height;
 					
 					Frame *frame = NULL;
-					try
+					while(frame == NULL)
 					{
-						frame = pUnusedInputFrameStack->top();
-						pUnusedInputFrameStack->pop();
+						if(pUnusedInputFrameStack->isEmpty() == false)
+						{
+							frame = pUnusedInputFrameStack->top();
+							pUnusedInputFrameStack->pop();
+							break;	//get frame : success
+						}
 					}
-					catch(const char *msg)
-					{
-						fprintf(stderr, "[Except]%s\n", msg);
-					}
+
 
 					//convert YUV420P->RGB24
 					YUV420PToRGB24(frame->getFrame(), w, h);
@@ -498,3 +499,7 @@ void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
 }
 
 
+bool VideoIO::isReadingComplete(void)
+{
+	return readComplete;
+}

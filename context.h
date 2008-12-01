@@ -3,6 +3,8 @@
 class FrameHeap;
 class FrameQueue;
 class FrameStack;
+class TextFrameStack;
+class TextFrameQueue;
 
 class Context	//save global variable, define,....
 {
@@ -18,6 +20,8 @@ public:
 	FrameQueue *getInputFrameQueue(void);
 	FrameStack *getUnusedInputFrameStack(void);
 	FrameStack *getUnusedOutputFrameStack(void);
+	TextFrameQueue *getTextFrameQueue(void);
+	TextFrameStack *getUnusedTextFrameStack(void);
 
 	int getFrameLimit(void);
 private:
@@ -30,6 +34,8 @@ private:
 	FrameQueue *pInputFrameQueue;
 	FrameStack *pUnusedInputFrameStack;
 	FrameStack *pUnusedOutputFrameStack;
+	TextFrameQueue *pTextFrameQueue;
+	TextFrameStack *getUnusedTextFrameStack;
 
 	int frameLimit;
 };

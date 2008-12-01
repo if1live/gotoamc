@@ -2,30 +2,29 @@
 #include "textFrame.h"
 #include "constNum.h"
 
-/*class TextFrame2PPM
-{
-public :
-    TextFrame2PPM();
-    void Convert( TextFrame* _inputFrame );
-
-
-    ~TextFrame2PPM();
-  
-private :
-    Frame* fonts[MAX_OF_FONTS];
-
-    };*/
+class Context;
+class TextFrameQueue;
+class TextFrameStack;
+class FrameHeap;
+class FrameStack;
 
 class TextFrame2PPM
 {
- public :
-  TextFrame2PPM();
-  void Convert();
+public :
+	TextFrame2PPM();
+	void convert(void);
 
+	int main(void);	//entry point
+	~TextFrame2PPM();
+	
+private :
+	Frame *fonts[MAX_OF_FONTS];
+	
+	Context *pContext;
 
-  ~TextFrame2PPM();
+	TextFrameQueue *pTextFrameQueue;
+	TextFrameStack *pUnusedTextFrameStack;
 
- private :
-  Frame *fonts[MAX_OF_FONTS];
-
+	FrameHeap *pOutputFrameHeap;
+	FrameStack *pUnusedOutputFrameStack;
 };
