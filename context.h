@@ -35,7 +35,7 @@ private:
 	FrameStack *pUnusedInputFrameStack;
 	FrameStack *pUnusedOutputFrameStack;
 	TextFrameQueue *pTextFrameQueue;
-	TextFrameStack *getUnusedTextFrameStack;
+	TextFrameStack *pUnusedTextFrameStack;
 
 	int frameLimit;
 };

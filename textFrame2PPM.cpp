@@ -41,10 +41,12 @@ TextFrame2PPM::TextFrame2PPM()
 	
 	//get data structure point
 	pContext = Context::instance();
+
 	pTextFrameQueue = pContext->getTextFrameQueue();
 	pUnusedTextFrameStack = pContext->getUnusedTextFrameStack();
+
 	pOutputFrameHeap = pContext->getOutputFrameHeap();
-	pUnusedOutputFrameStack = pContext0>getUnusedOutputFrameStack();
+	pUnusedOutputFrameStack = pContext->getUnusedOutputFrameStack();
 
 	//create unused output frame
 	createEmptyFrame();
@@ -72,7 +74,7 @@ void TextFrame2PPM::createEmptyFrame(void)
 
 		//create frame
 		Frame *frame = new Frame();
-		frame.setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
+		frame->setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
 		pUnusedOutputFrameStack->push(frame);
 	}
 }
@@ -109,10 +111,10 @@ void TextFrame2PPM::convert()
 	Frame *outputFrame = NULL;
 	while(outputFrame == NULL)
 	{
-		if(pUnusedOutputFrameQueue->isEmpty() == false)
+		if(pUnusedOutputFrameStack->isEmpty() == false)
 		{
-			outputFrame = pUnusedOutputFrameQueue->front();
-			pUnusedOutputFrameQueue->pop();
+			outputFrame = pUnusedOutputFrameStack->top();
+			pUnusedOutputFrameStack->pop();
 			break;	//get empty frame : success
 		}
 	}

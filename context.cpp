@@ -6,6 +6,7 @@
 #include "textFrameStack.h"
 #include "textFrameQueue.h"
 #include "frame.h"
+#include "textFrame.h"
 
 Context::Context()
 {
@@ -72,8 +73,8 @@ Context::~Context()
 	{
 		while(pTextFrameQueue->isEmpty() == false)
 		{
-			TextFrame *frame = pTextFrameQueue->front();
-			delete frame;
+			TextFrame *textFrame = pTextFrameQueue->front();
+			delete textFrame;
 			pTextFrameQueue->pop();
 		}
 		delete pTextFrameQueue;
@@ -84,9 +85,9 @@ Context::~Context()
 	{
 		while(pUnusedTextFrameStack->isEmpty() == false)
 		{
-			TextFrame *frame = pUnusedTextFrameStack->top();
-			delete frame;
-			pUnuesdTextFrameStack->pop();
+			TextFrame *textFrame = pUnusedTextFrameStack->top();
+			delete textFrame;
+			pUnusedTextFrameStack->pop();
 		}
 		delete pUnusedTextFrameStack;
 		pUnusedTextFrameStack = NULL;
