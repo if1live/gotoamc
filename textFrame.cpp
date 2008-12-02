@@ -6,6 +6,8 @@
 
 TextFrame::TextFrame(Frame* _pFrame)
 {
+	this->originalFramePointer = _pFrame;
+	
 	// get width and height
 	width = _pFrame->getWidth();
 	height = _pFrame->getHeight();
@@ -56,14 +58,17 @@ int TextFrame::getWidth(void)
 {
 	return this->width;
 }
+
 int TextFrame::getHeight(void)
 {
 	return this->height;
 }
+
 int TextFrame::getTextWidth(void)
 {
 	return this->textWidth;
 }
+
 int TextFrame::getTextHeight(void)
 {
 	return this->textHeight;
@@ -72,6 +77,11 @@ int TextFrame::getTextHeight(void)
 unsigned char* TextFrame::getText(void)
 {
 	return this->aadata;
+}
+
+Frame* getFramePointer(void)
+{
+	return this->originalFramePointer;
 }
 
 void TextFrame::print(void) // for debugging purpose
@@ -84,16 +94,4 @@ int TextFrame::main(void)
 {
 	///TODO : entry point
 	return 0;
-}
-
-
-void TextFrame::setInputFrameQueue(FrameQueue *_ptr)
-{
-	pInputFrameQueue = _ptr;
-}
-
-
-void TextFrame::setUnusedInputFrameStack(FrameStack *_ptr)
-{
-	pUnusedInputFrameStack = _ptr;
 }

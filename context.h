@@ -13,7 +13,6 @@ public:
 
 	//dtor
 	~Context();
-	
 
 	//getter and setter
 	FrameHeap *getOutputFrameHeap(void);

@@ -9,16 +9,14 @@ class TextFrame
 {
 public:
 	//ctor
-	TextFrame(Frame* _pFrame);	// create text-converted frame
+	TextFrame(Frame* _pFrame);	// load frame
 	int getWidth(void);
 	int getHeight(void);
 	int getTextWidth(void);
 	int getTextHeight(void);
 	unsigned char* getText(void);	// get text!
+	Frame* getFramePointer(void); // get original frame pointer 
 	void print(void);	// for debugging purpose
-
-	void setInputFrameQueue(FrameQueue *_ptr);
-	void setUnusedInputFrameStack(FrameStack *_ptr);
 	
 	int main(void);	//entry point
 
@@ -33,10 +31,5 @@ private:
 	int textWidth;		// aa width
 	int textHeight;		// aa height
 
-	//communicate with VideoIO
-	FrameQueue *pInputFrameQueue;
-	FrameStack *pUnusedInputFrameStack;
-
-	//TODO : communicate with (textFrame(ascii) -> frame(image))
-	//
+	Frame* originalFramePointer;	// pointer to the original frame
 };
