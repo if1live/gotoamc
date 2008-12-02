@@ -18,6 +18,8 @@ public :
 	~TextFrame2PPM();
 	
 private :
+	void createEmptyFrame(void);
+
 	Frame *fonts[MAX_OF_FONTS];
 	
 	Context *pContext;
@@ -27,4 +29,6 @@ private :
 
 	FrameHeap *pOutputFrameHeap;
 	FrameStack *pUnusedOutputFrameStack;
+
+	
 };

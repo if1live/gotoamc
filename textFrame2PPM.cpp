@@ -9,15 +9,17 @@
 TextFrame2PPM::TextFrame2PPM()
 {
 	//open font ppm file : BEGIN
-	for(int i = 0 ; i < 128 ; i++)
+	char *buffer = new char[32];
+	
+	for(int i = 0 ; i < MAX_OF_FONTS ; i++)
 	{
 		fonts[i] = new Frame();	//frame of font image
 		
-		char *buffer = new char[32];
 		snprintf(buffer, sizeof(buffer), "src/%d.ppm", i);
 		fonts[i]->openP3PPM(buffer);
-		delete[] buffer;
 	}
+	delete[] buffer;
+
 /*	for (int i = 97 ; i < 100 ; i++ )
     {
 		fonts[i] = new Frame();
@@ -43,6 +45,36 @@ TextFrame2PPM::TextFrame2PPM()
 	pUnusedTextFrameStack = pContext->getUnusedTextFrameStack();
 	pOutputFrameHeap = pContext->getOutputFrameHeap();
 	pUnusedOutputFrameStack = pContext0>getUnusedOutputFrameStack();
+
+	//create unused output frame
+	createEmptyFrame();
+}
+
+void TextFrame2PPM::createEmptyFrame(void)
+{
+	//get a text frame to get text width, text height
+	TextFrame *textFrame = NULL;
+	while(textFrame == NULL)
+	{
+		if(pTextFrameQueue->isEmpty() == false)
+		{
+			textFrame = pTextFrameQueue->front();
+			break;
+		}
+	}
+
+
+	int frameLimit = pContext->getFrameLimit();
+	for(int i = 0 ; i < frameLimit ; i++)
+	{
+		int width = textFrame->getTextWidth();
+		int height = textFrame->getTextHeight();
+
+		//create frame
+		Frame *frame = new Frame();
+		frame.setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
+		pUnusedOutputFrameStack->push(frame);
+	}
 }
 
 int TextFrame2PPM::main(void)
@@ -64,13 +96,14 @@ void TextFrame2PPM::convert()
 	{
 		if(pTextFrameQueue->isEmpty() == false)
 		{
-			textFrame = pTextFrameQueue->top();
+			textFrame = pTextFrameQueue->front();
 			pTextFrameQueue->pop();	//get text frame : success
 		}
 	}
 
-	int height = textFrame->getHeight();	//3
-	int width = textFrame->getWidth();	//5
+	int height = textFrame->getTextHeight();	//3
+	int width = textFrame->getTextWidth();	//5
+	unsigned char *buffer = textFrame->getText();
 //	char* testChar = " abc  bca  cab ";
 
 	Frame *outputFrame = NULL;
@@ -94,9 +127,10 @@ void TextFrame2PPM::convert()
 			{
 				for ( int q = 0 ; q < WIDTH_OF_FONTS ; q++ )
 				{
-					int rgb = fonts[testChar[i*width + j]]->getRGB(q, p);
+					int rgb = fonts[buffer[i*width + j]]->getRGB(q, p);
 					unsigned char value = 0x000000ff & rgb;
-					outputFrame->setGrey( q, p, value );
+
+					outputFrame->setGrey( q + j*WIDTH_OF_FONTS, p + i*HEIGHT_OF_FONTS, value );
 				}
 			}
 		}
@@ -110,9 +144,8 @@ void TextFrame2PPM::convert()
 TextFrame2PPM::~TextFrame2PPM()
 {
 	//free font image
-	for ( int i = 97 ; i < 100 ; i++ )
+	for ( int i = 0 ; i < MAX_OF_FONTS ; i++ )
 		delete fonts[i];
-	delete fonts[32]; 
 }
 
 
