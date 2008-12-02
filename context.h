@@ -5,6 +5,10 @@ class FrameQueue;
 class FrameStack;
 class TextFrameStack;
 class TextFrameQueue;
+class VideoIO;
+class TextFrame2PPM;
+class Frame2TextFrame;
+
 
 class Context	//save global variable, define,....
 {
@@ -22,6 +26,14 @@ public:
 	TextFrameQueue *getTextFrameQueue(void);
 	TextFrameStack *getUnusedTextFrameStack(void);
 
+	VideoIO *getVideoIO(void);
+	TextFrame2PPM *getTextFrame2PPM(void);
+	Frame2TextFrame *getFrame2TextFrame(void);
+
+	void setVideoIO(VideoIO *_ptr);
+	void setTextFrame2PPM(TextFrame2PPM *_ptr);
+	void setFrame2TextFrame(Frame2TextFrame *_ptr);
+
 	int getFrameLimit(void);
 private:
 	//ctor
@@ -35,6 +47,10 @@ private:
 	FrameStack *pUnusedOutputFrameStack;
 	TextFrameQueue *pTextFrameQueue;
 	TextFrameStack *pUnusedTextFrameStack;
+
+	VideoIO *pVideoIO;
+	TextFrame2PPM *pTextFrame2PPM;
+	Frame2TextFrame *pFrame2TextFrame;
 
 	int frameLimit;
 };

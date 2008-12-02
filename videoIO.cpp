@@ -51,6 +51,8 @@ VideoIO::VideoIO()
 	outBufferSize = -1;
 	readComplete = false;
 
+	//set pointer of this
+	pContext->setVideoIO(this);
 }
 
 VideoIO::~VideoIO()

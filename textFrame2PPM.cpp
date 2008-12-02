@@ -50,6 +50,9 @@ TextFrame2PPM::TextFrame2PPM()
 
 	//create unused output frame
 	createEmptyFrame();
+
+	//set pointer of this
+	pContext->setTextFrame2PPM(this);
 }
 
 void TextFrame2PPM::createEmptyFrame(void)
@@ -103,8 +106,8 @@ void TextFrame2PPM::convert()
 		}
 	}
 
-	int height = textFrame->getTextHeight();	//3
-	int width = textFrame->getTextWidth();	//5
+	int height = textFrame->getTextHeight();
+	int width = textFrame->getTextWidth();
 	unsigned char *buffer = textFrame->getText();
 //	char* testChar = " abc  bca  cab ";
 
@@ -140,7 +143,6 @@ void TextFrame2PPM::convert()
 	
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
-//	outputFrame.saveP3PPM( "output.ppm" );
 }
 
 TextFrame2PPM::~TextFrame2PPM()

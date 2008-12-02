@@ -79,7 +79,7 @@ unsigned char* TextFrame::getText(void)
 	return this->aadata;
 }
 
-Frame* getFramePointer(void)
+Frame* TextFrame::getFramePointer(void)
 {
 	return this->originalFramePointer;
 }

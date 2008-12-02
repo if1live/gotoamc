@@ -17,6 +17,10 @@ Context::Context()
 	pUnusedOutputFrameStack = new FrameStack(frameLimit);
 	pTextFrameQueue = new TextFrameQueue(frameLimit);
 	pUnusedTextFrameStack = new TextFrameStack(frameLimit);
+
+	pVideoIO = NULL;
+	pTextFrame2PPM = NULL;
+	pFrame2TextFrame = NULL;
 }
 
 Context::~Context()
@@ -92,6 +96,22 @@ Context::~Context()
 		delete pUnusedTextFrameStack;
 		pUnusedTextFrameStack = NULL;
 	}
+
+	if(pVideoIO != NULL)
+	{
+		delete pVideoIO;
+	}
+
+
+	if(pTextFrame2PPM != NULL)
+	{
+		delete pTextFrame2PPM;
+	}
+
+	if(pFrame2TextFrame != NULL)
+	{
+		delete pFrame2TextFrame;
+	}
 }
 
 
@@ -139,4 +159,52 @@ TextFrameQueue *Context::getTextFrameQueue(void)
 TextFrameStack *Context::getUnusedTextFrameStack(void)
 {
 	return pUnusedTextFrameStack;
+}
+
+
+VideoIO *Context::getVideoIO(void)
+{
+	while(pVideoIO == NULL)
+	{
+		;	//wait 
+	}
+	return pVideoIO;
+}
+
+
+TextFrame2PPM *Context::getTextFrame2PPM(void)
+{
+	while(pTextFrame2PPM == NULL)
+	{
+		;	//wait
+	}
+	return pTextFrame2PPM;
+}
+
+
+Frame2TextFrame *Context::getFrame2TextFrame(void)
+{
+	while(pFrame2TextFrame == NULL)
+	{
+		;	//wait
+	}
+	return pFrame2TextFrame;
+}
+
+
+void Context::setVideoIO(VideoIO *_ptr)
+{
+	pVideoIO = _ptr;
+}
+
+
+void Context::setTextFrame2PPM(TextFrame2PPM *_ptr)
+{
+	pTextFrame2PPM = _ptr;
+}
+
+
+void Context::setFrame2TextFrame(Frame2TextFrame *_ptr)
+{
+	pFrame2TextFrame = _ptr;
 }
