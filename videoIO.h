@@ -15,10 +15,10 @@ extern "C" {
 
 class Frame;
 class FrameHeap;
-class FrameStack;
 class Context;
 
 template <class T> class Queue;
+template <class T> class Stack;
 
 class VideoIO
 {
@@ -66,8 +66,8 @@ private:
 	Queue<Frame *> *pInputFrameQueue;	//save read frame from video
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video
 
-	FrameStack *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
-	FrameStack *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
+	Stack<Frame *> *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)
+	Stack<Frame *> *pUnusedOutputFrameStack;	//available frame(use pOutputHeap then push to this)
 
 	Context *pContext;
 	AVFrame *pInputFrame;

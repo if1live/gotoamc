@@ -6,12 +6,11 @@
 #define HEIGHT_OF_FONTS 16 //33
 
 class Context;
-class TextFrameStack;
 class FrameHeap;
-class FrameStack;
 class TextFrame;
 
 template <class T> class Queue;
+template <class T> class Stack;
 
 class TextFrame2PPM
 {
@@ -30,10 +29,10 @@ private :
 	Context *pContext;
 
 	Queue<TextFrame *> *pTextFrameQueue;
-	TextFrameStack *pUnusedTextFrameStack;
+	Stack<TextFrame *> *pUnusedTextFrameStack;
 
 	FrameHeap *pOutputFrameHeap;
-	FrameStack *pUnusedOutputFrameStack;
+	Stack<Frame *> *pUnusedOutputFrameStack;
 
 	
 };

@@ -1,7 +1,7 @@
 #include "frame2TextFrame.h"
 #include "context.h"
-#include "textFrameStack.h"
 #include "queue.h"
+#include "stack.h"
 
 Frame2TextFrame::Frame2TextFrame()
 {
@@ -17,7 +17,7 @@ void Frame2TextFrame::main(void)
 {
 	Context* context;
 	Queue<Frame *>* frameQueue;
-	TextFrameStack* unusedTextFrameStack;
+	Stack<TextFrame *>* unusedTextFrameStack;
 	Queue<TextFrame *>* textFrameQueue;
 
 	Frame* frame;

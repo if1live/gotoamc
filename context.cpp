@@ -2,8 +2,6 @@
 #include <cassert>
 #include "context.h"
 #include "frameHeap.h"
-#include "frameStack.h"
-#include "textFrameStack.h"
 #include "frame.h"
 #include "textFrame.h"
 #include "textFrame2PPM.h"
@@ -15,10 +13,10 @@ Context::Context()
 	frameLimit = 10;
 	pOutputFrameHeap = new FrameHeap(frameLimit);
 	pInputFrameQueue = new Queue<Frame *>(frameLimit);
-	pUnusedInputFrameStack = new FrameStack(frameLimit);
-	pUnusedOutputFrameStack = new FrameStack(frameLimit);
+	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit);
+	pUnusedOutputFrameStack = new Stack<Frame *>(frameLimit);
 	pTextFrameQueue = new Queue<TextFrame *>(frameLimit);
-	pUnusedTextFrameStack = new TextFrameStack(frameLimit);
+	pUnusedTextFrameStack = new Stack<TextFrame *>(frameLimit);
 
 	pVideoIO = NULL;
 	pTextFrame2PPM = NULL;
@@ -132,12 +130,12 @@ Queue<Frame *> *Context::getInputFrameQueue(void)
 	return pInputFrameQueue;
 }
 
-FrameStack *Context::getUnusedInputFrameStack(void)
+Stack<Frame *> *Context::getUnusedInputFrameStack(void)
 {
 	return pUnusedInputFrameStack;
 }
 
-FrameStack *Context::getUnusedOutputFrameStack(void)
+Stack<Frame *> *Context::getUnusedOutputFrameStack(void)
 {
 	return pUnusedOutputFrameStack;
 }
@@ -152,7 +150,7 @@ Queue<TextFrame *> *Context::getTextFrameQueue(void)
 	return pTextFrameQueue;
 }
 
-TextFrameStack *Context::getUnusedTextFrameStack(void)
+Stack<TextFrame *> *Context::getUnusedTextFrameStack(void)
 {
 	return pUnusedTextFrameStack;
 }
