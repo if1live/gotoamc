@@ -1,23 +1,29 @@
+#include "frame2TextFrame.h"
 #include "context.h"
-#include "frameQueue.h"
-#include "textFrameQueue.h"
 #include "textFrameStack.h"
+#include "queue.h"
 
-class FrameQueue;
-class TextFrameQueue;
-class TextFrameStack;
+Frame2TextFrame::Frame2TextFrame()
+{
+	///TODO
+}
+
+Frame2TextFrame::~Frame2TextFrame()
+{
+	///TODO
+}
 
 void Frame2TextFrame::main(void)
 {
 	Context* context;
-	FrameQueue* frameQueue;
+	Queue<Frame *>* frameQueue;
 	TextFrameStack* unusedTextFrameStack;
-	TextFrameQueue* textFrameQueue;
+	Queue<TextFrame *>* textFrameQueue;
 
 	Frame* frame;
 	TextFrame* textFrame;
 
-	context = TextFrameQueue::instance();
+	context = Context::instance();
 
 	// get frame queue
 	frameQueue = context->getInputFrameQueue();

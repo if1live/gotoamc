@@ -1,12 +1,11 @@
 #include <cstdlib>
 #include <stdio.h>
-#include "constNum.h"
 #include "videoIO.h"
 #include "frame.h"
 #include "frameHeap.h"
-#include "frameQueue.h"
 #include "frameStack.h"
 #include "context.h"
+#include "queue.h"
 
 VideoIO::VideoIO()
 {
@@ -24,12 +23,6 @@ VideoIO::VideoIO()
 	pOutputFrame = NULL;
 
 	continueReadFrame = true;
-
-	//set pointer to null
-//	pInputFrameQueue = NULL;
-//	pOutputFrameHeap = NULL;
-//	pUnusedInputFrameStack = NULL;
-//	pUnusedOutputFrameStack = NULL;
 
 	pContext = Context::instance();	//get Context class
 

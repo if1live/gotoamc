@@ -1,10 +1,11 @@
 #include <cassert>
+#include "queue.h"
 #include "textFrame2PPM.h"
 #include "context.h"
 #include "frameStack.h"
 #include "frameHeap.h"
 #include "textFrameStack.h"
-#include "textFrameQueue.h"
+
 
 TextFrame2PPM::TextFrame2PPM()
 {

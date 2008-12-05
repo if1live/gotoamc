@@ -7,9 +7,10 @@ int main(int argc, char *argv[])
 {
 	Context *context = Context::instance();	//create global data
 
-	VideoIO videoIO;
-	videoIO.main(argc, argv);
-
+//	VideoIO videoIO;
+//	videoIO.main(argc, argv);
+	VideoIO *videoIO = new VideoIO();
+	videoIO->main(argc, argv);
 //	TextFrame2PPM test;
 //	test.Convert();
 	

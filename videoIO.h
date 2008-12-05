@@ -4,8 +4,10 @@
 extern "C" {
 #endif
 
-#include "libs.h"
+#include <avcodec.h>
+#include <avformat.h>
 #include <stdio.h>
+
 
 #ifdef __cplusplus
 }
@@ -13,9 +15,10 @@ extern "C" {
 
 class Frame;
 class FrameHeap;
-class FrameQueue;
 class FrameStack;
 class Context;
+
+template <class T> class Queue;
 
 class VideoIO
 {
@@ -60,7 +63,7 @@ private:
 	int videoStream;
 	int frameFinished;
 
-	FrameQueue *pInputFrameQueue;	//save read frame from video
+	Queue<Frame *> *pInputFrameQueue;	//save read frame from video
 	FrameHeap *pOutputFrameHeap;	//save writing frame to video
 
 	FrameStack *pUnusedInputFrameStack;	//available frame(use this then push to pInputQueue)

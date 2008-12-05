@@ -6,4 +6,5 @@ public:
 	~Frame2TextFrame();
 	void main(void);
 private:
-}
+};
+

@@ -1,10 +1,12 @@
 #pragma once
 
+#include "queue.h"
+
+class Frame;
+class TextFrame;
 class FrameHeap;
-class FrameQueue;
 class FrameStack;
 class TextFrameStack;
-class TextFrameQueue;
 class VideoIO;
 class TextFrame2PPM;
 class Frame2TextFrame;
@@ -20,10 +22,10 @@ public:
 
 	//getter and setter
 	FrameHeap *getOutputFrameHeap(void);
-	FrameQueue *getInputFrameQueue(void);
+	Queue<Frame *> *getInputFrameQueue(void);
 	FrameStack *getUnusedInputFrameStack(void);
 	FrameStack *getUnusedOutputFrameStack(void);
-	TextFrameQueue *getTextFrameQueue(void);
+	Queue<TextFrame *> *getTextFrameQueue(void);
 	TextFrameStack *getUnusedTextFrameStack(void);
 
 	VideoIO *getVideoIO(void);
@@ -42,10 +44,10 @@ private:
 	static Context *context;
 
 	FrameHeap *pOutputFrameHeap;
-	FrameQueue *pInputFrameQueue;
+	Queue<Frame *> *pInputFrameQueue;
 	FrameStack *pUnusedInputFrameStack;
 	FrameStack *pUnusedOutputFrameStack;
-	TextFrameQueue *pTextFrameQueue;
+	Queue<TextFrame *> *pTextFrameQueue;
 	TextFrameStack *pUnusedTextFrameStack;
 
 	VideoIO *pVideoIO;

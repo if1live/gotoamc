@@ -1,21 +1,23 @@
 #include <stdio.h>
+#include <cassert>
 #include "context.h"
 #include "frameHeap.h"
-#include "frameQueue.h"
 #include "frameStack.h"
 #include "textFrameStack.h"
-#include "textFrameQueue.h"
 #include "frame.h"
 #include "textFrame.h"
+#include "textFrame2PPM.h"
+#include "videoIO.h"
+#include "frame2TextFrame.h"
 
 Context::Context()
 {
-	frameLimit = 30;
+	frameLimit = 10;
 	pOutputFrameHeap = new FrameHeap(frameLimit);
-	pInputFrameQueue = new FrameQueue(frameLimit);
+	pInputFrameQueue = new Queue<Frame *>(frameLimit);
 	pUnusedInputFrameStack = new FrameStack(frameLimit);
 	pUnusedOutputFrameStack = new FrameStack(frameLimit);
-	pTextFrameQueue = new TextFrameQueue(frameLimit);
+	pTextFrameQueue = new Queue<TextFrame *>(frameLimit);
 	pUnusedTextFrameStack = new TextFrameStack(frameLimit);
 
 	pVideoIO = NULL;
@@ -27,30 +29,23 @@ Context::~Context()
 {
 	if(pOutputFrameHeap != NULL)
 	{
-		while(pOutputFrameHeap->isEmpty() == false)
-		{
-			Frame *frame = pOutputFrameHeap->top();
-			delete frame;
-			pOutputFrameHeap->pop();
-		}
+		fprintf(stderr, "[Context]OutputFrameHeap delete\n");
+		assert(pOutputFrameHeap->isEmpty() == true && "OutputFrameHeap is not empty!");
 		delete pOutputFrameHeap;
 		pOutputFrameHeap = NULL;
 	}
 
 	if(pInputFrameQueue != NULL)
 	{
-		while(pInputFrameQueue->isEmpty() == false)
-		{
-			Frame *frame = pInputFrameQueue->front();
-			delete frame;
-			pInputFrameQueue->pop();
-		}
+		fprintf(stderr, "[Context]InputFrameQueue delete\n");
+		assert(pInputFrameQueue->isEmpty() == true && "InputFrameQueue is not empty!");
 		delete pInputFrameQueue;
 		pInputFrameQueue = NULL;
 	}
 
 	if(pUnusedInputFrameStack != NULL)
 	{
+		fprintf(stderr, "[Context]UnusedInputFrameStack delete\n");
 		while(pUnusedInputFrameStack->isEmpty() == false)
 		{
 			Frame *frame = pUnusedInputFrameStack->top();
@@ -63,6 +58,7 @@ Context::~Context()
 	
 	if(pUnusedOutputFrameStack != NULL)
 	{
+		fprintf(stderr, "[Context]UnusedOutputFrameStack delete\n");
 		while(pUnusedOutputFrameStack->isEmpty() == false)
 		{
 			Frame *frame = pUnusedOutputFrameStack->top();
@@ -75,18 +71,15 @@ Context::~Context()
 	
 	if(pTextFrameQueue != NULL)
 	{
-		while(pTextFrameQueue->isEmpty() == false)
-		{
-			TextFrame *textFrame = pTextFrameQueue->front();
-			delete textFrame;
-			pTextFrameQueue->pop();
-		}
+		fprintf(stderr, "[Context]TextFrameQueue delete\n");
+		assert(pTextFrameQueue->isEmpty() == true && "TextFrameQueue is not empty!");
 		delete pTextFrameQueue;
 		pTextFrameQueue = NULL;
 	}
 
 	if(pUnusedTextFrameStack != NULL)
 	{
+		fprintf(stderr, "[Context]UnusedTextFrameStack delete\n");
 		while(pUnusedTextFrameStack->isEmpty() == false)
 		{
 			TextFrame *textFrame = pUnusedTextFrameStack->top();
@@ -99,17 +92,20 @@ Context::~Context()
 
 	if(pVideoIO != NULL)
 	{
+		fprintf(stderr, "[Context]VideoIO delete\n");
 		delete pVideoIO;
 	}
 
 
 	if(pTextFrame2PPM != NULL)
 	{
+		fprintf(stderr, "[Context]TextFrame2PPM delete\n");
 		delete pTextFrame2PPM;
 	}
 
 	if(pFrame2TextFrame != NULL)
 	{
+		fprintf(stderr, "[Context]Frame2TextFrame delete\n");
 		delete pFrame2TextFrame;
 	}
 }
@@ -131,7 +127,7 @@ FrameHeap *Context::getOutputFrameHeap(void)
 	return pOutputFrameHeap;
 }
 
-FrameQueue *Context::getInputFrameQueue(void)
+Queue<Frame *> *Context::getInputFrameQueue(void)
 {
 	return pInputFrameQueue;
 }
@@ -151,7 +147,7 @@ int Context::getFrameLimit(void)
 	return frameLimit;
 }
 
-TextFrameQueue *Context::getTextFrameQueue(void)
+Queue<TextFrame *> *Context::getTextFrameQueue(void)
 {
 	return pTextFrameQueue;
 }
@@ -164,30 +160,21 @@ TextFrameStack *Context::getUnusedTextFrameStack(void)
 
 VideoIO *Context::getVideoIO(void)
 {
-	while(pVideoIO == NULL)
-	{
-		;	//wait 
-	}
+	assert(pVideoIO != NULL && "pVideoIO is NULL!");
 	return pVideoIO;
 }
 
 
 TextFrame2PPM *Context::getTextFrame2PPM(void)
 {
-	while(pTextFrame2PPM == NULL)
-	{
-		;	//wait
-	}
+	assert(pTextFrame2PPM != NULL && "pTextFrame2PPM is NULL");
 	return pTextFrame2PPM;
 }
 
 
 Frame2TextFrame *Context::getFrame2TextFrame(void)
 {
-	while(pFrame2TextFrame == NULL)
-	{
-		;	//wait
-	}
+	assert(pFrame2TextFrame != NULL && "pFrame2TexteFrame is NULL");
 	return pFrame2TextFrame;
 }
 
