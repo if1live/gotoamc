@@ -1,38 +1,106 @@
 #include "frame2TextFrame.h"
 #include "context.h"
+#include "frame.h"
 #include "queue.h"
 #include "stack.h"
+#include <aalib.h>
 
 Frame2TextFrame::Frame2TextFrame()
 {
-	///TODO
+	// get context
+	pContext = Context::instance();
+	
+	// get input frame queue
+	pFrameQueue = pContext->getInputFrameQueue();
+	
+	// get unused text frame stack
+	pUnusedTextFrameStack = context->getUnusedTextFrameStack();
+
+	// get text frame queue
+	pTextFrameQueue = context->getTextFrameQueue();	
 }
 
 Frame2TextFrame::~Frame2TextFrame()
 {
-	///TODO
+	
 }
 
 void Frame2TextFrame::main(void)
 {
-	Context* context;
-	Queue<Frame *>* frameQueue;
-	Stack<TextFrame *>* unusedTextFrameStack;
-	Queue<TextFrame *>* textFrameQueue;
+	conversionLoop();
+	// TODO: run this with threads
+}
 
-	Frame* frame;
-	TextFrame* textFrame;
+void Frame2TextFrame::conversionLoop(void)
+{
+	Frame* pFrame;
+	while(!pFrameQueue->isEmpty())
+	{
+		pFrame = pFrameQueue->pop();
+		convertFrame(pFrame);	
+	}
+}
 
-	context = Context::instance();
+void Frame2TextFrame::convertFrame(Frame* _pFrame)
+{
+	TextFrame* pTextFrame;
+	if(pUnusedTextFrameStack->isEmpty())
+		pTextFrame = new TextFrame();
+	else
+		pTextFrame = pUnusedTextFrameStack->pop();
 
-	// get frame queue
-	frameQueue = context->getInputFrameQueue();
+	aa_hardware_params hParams;	// hardware params for aalib
 	
-	// get unused text frame stack
-	unusedTextFrameStack = context->getUnusedTextFrameStack();
+	aa_context *c;	// aa context
+
+	// get width and height and save to TextFrame
+	int width = _pFrame->getWidth();
+	int height = _pFrame->getHeight();
+	pTextFrame->setWidth(width);
+	pTextFrame->setHeight(height);
 	
-	// get frame
-	frame = frameQueue->pop();
+	// set hardware params. for aalib
+	hParams = aa_defparams;
+	hParams.minwidth = width/2;
+	hParams.minheight = height/2;
+	hParams.maxwidth = width/2 - (width/2)%100 + 100;
+	hParams.maxheight = width/2 - (width/2)%100 + 100;
+
+	// copy mem_d to prevent collision
+	aa_driver aa_md;
+	aa_md = mem_d;
+
+	// copy aa_defrenderparams to prevent collision
+	aa_renderparams aa_rp;
+	aa_rp = aa_defrenderparams;	
 	
-	// get text frame
+	// init context
+	c = aa_init(&aa_md, &hParams, NULL);
+	
+	if(c == NULL)
+		throw "Failed to initialize aalib";
+
+	// get RGB values from frame and put pixels with greyscale-converted value
+	for(int i=0; i<width; i++)
+	{
+		for(int j=0; j<height; j++)
+		{
+			int rgbValue = _pFrame->getRGB(i,j);
+		//	printf("i:%d j:%d r:%d g:%d b:%d grs:%d\n", i,j,(rgbValue&RMASK)>>16, (rgbValue&GMASK)>>8, (rgbValue&BMASK), (int)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
+			aa_putpixel(c, i, j,(unsigned char)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
+		}
+	}
+	// render into ascii art
+	int textWidth = aa_scrwidth(c);
+	int textHeight = aa_scrheight(c);
+	pTextFrame->setTextWidth(textWidth);	// save text width
+	pTextFrame->setTextHeight(textHeight);	// save text height
+	aa_render(c, &aa_rp, 0, 0, textWidth, textHeight);
+	aa_flush(c);
+
+	pTextFrame->setText(aa_text(c));	// save converted text
+	aa_close(c);	// close used aa context
+
+	// push to the text frame queue
+	pTextFrameQueue->push(pTextFrame);
 }
