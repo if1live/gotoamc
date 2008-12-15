@@ -37,6 +37,13 @@ void Frame2TextFrame::conversionLoop(void)
 	}
 }
 
+void Frame2TextFrame::convertFrame(void)
+{
+	Frame *frame = NULL;
+	frame = pInputFrameQueue->pop();
+	convertFrame(frame);
+}
+
 void Frame2TextFrame::convertFrame(Frame* _pFrame)
 {
 	TextFrame* pTextFrame;

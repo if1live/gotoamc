@@ -330,6 +330,22 @@ bool Frame::saveP6PPM(char *_filename)
 	return true;
 }
 
+bool Frame::openPPM(char *_filename)
+{
+	///TODO
+}
+
+bool Frame::openP4PPM(char *_filename)
+{
+	///TODO
+}
+
+bool Frame::openP5PPM(char *_filename)
+{
+	///TODO
+}
+
+
 bool Frame::saveP3PPM(char *_filename)
 {
 	//if frame not defined, return false(error code)

@@ -14,7 +14,7 @@ TextFrame2PPM::TextFrame2PPM()
 	{
 		fonts[i] = new Frame();	//frame of font image
 		
-		snprintf(buffer, sizeof(buffer), "src/%d.ppm", i);
+		snprintf(buffer, sizeof(buffer)*32, "res/%d.ppm", i);
 		fonts[i]->openP3PPM(buffer);
 	}
 	delete[] buffer;

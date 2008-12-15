@@ -353,7 +353,7 @@ bool VideoIO::openOutputCodec(char *_filename, int _width, int _height)
 		exit(EXIT_FAILURE);
 	}
 
-	pOutputCodec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);
+	pOutputCodec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
 
 	if(pOutputCodec == NULL)
 	{

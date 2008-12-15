@@ -47,7 +47,11 @@ public:
 	bool setWhite(int _x, int _y);
 
 	//only ppm support
+	bool openPPM(char *_filename);
 	bool openP3PPM(char *_filename);
+	bool openP4PPM(char *_filename);
+	bool openP5PPM(char *_filename);
+
 	bool saveP3PPM(char *_filename);
 	bool saveP6PPM(char *_filename);
 
