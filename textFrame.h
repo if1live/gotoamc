@@ -17,9 +17,6 @@ public:
 	void setText(unsigned char* _text);	// set text.
 	void clearText(void); // clear saved text
 	void print(void);	// for debugging purpose
-
-	//dtor
-	~TextFrame();
 private:
 	unsigned char *text;	// converted data
 	int width;	//width of original frame

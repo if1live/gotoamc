@@ -1,6 +1,6 @@
 #include "textFrame.h"
 #include <iostream>
-#include <string>
+#include <cstring>
 
 TextFrame::TextFrame()
 {
@@ -59,13 +59,14 @@ unsigned char* TextFrame::getText(void)
 	return this->text;
 }
 
-void setText(unsigned char* _text)
+void TextFrame::setText(unsigned char* _text)
 {
-	text = new char[strlen(_text)];
-	strncpy(this->text, _text, strlen(_text));
+	int size = strlen((const char*)_text);
+	text = new unsigned char[size];
+	memcpy(this->text, _text, size * sizeof(unsigned char));
 }
 
-void clearText(void)
+void TextFrame::clearText(void)
 {
 	if(text)	// NOT NULL
 	{
@@ -78,7 +79,7 @@ void clearText(void)
 
 void TextFrame::print(void) // for debugging purpose
 {
-	std::cout << aadata << std::endl;
+	std::cout << text << std::endl;
 	std::cout << "TextWidth: " << textWidth << "TextHeight: " << textHeight << std::endl;
 }
 
