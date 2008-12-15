@@ -1,8 +1,4 @@
 #include "frame2TextFrame.h"
-#include "context.h"
-#include "frame.h"
-#include "queue.h"
-#include "stack.h"
 #include <aalib.h>
 
 Frame2TextFrame::Frame2TextFrame()
@@ -11,13 +7,13 @@ Frame2TextFrame::Frame2TextFrame()
 	pContext = Context::instance();
 	
 	// get input frame queue
-	pFrameQueue = pContext->getInputFrameQueue();
+	pInputFrameQueue = pContext->getInputFrameQueue();
 	
 	// get unused text frame stack
-	pUnusedTextFrameStack = context->getUnusedTextFrameStack();
+	pUnusedTextFrameStack = pContext->getUnusedTextFrameStack();
 
 	// get text frame queue
-	pTextFrameQueue = context->getTextFrameQueue();	
+	pTextFrameQueue = pContext->getTextFrameQueue();	
 }
 
 Frame2TextFrame::~Frame2TextFrame()
@@ -34,9 +30,9 @@ void Frame2TextFrame::main(void)
 void Frame2TextFrame::conversionLoop(void)
 {
 	Frame* pFrame;
-	while(!pFrameQueue->isEmpty())
+	while(!pInputFrameQueue->isEmpty())
 	{
-		pFrame = pFrameQueue->pop();
+		pFrame = pInputFrameQueue->pop();
 		convertFrame(pFrame);	
 	}
 }
