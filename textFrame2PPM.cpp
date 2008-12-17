@@ -30,10 +30,12 @@ TextFrame2PPM::TextFrame2PPM()
 	pOutputFrameHeap = pContext->getOutputFrameHeap();
 	pUnusedOutputFrameStack = pContext->getUnusedOutputFrameStack();
 	//create unused output frame
-	createEmptyFrame();
+//	createEmptyFrame();
 
 	//set pointer of this
 	pContext->setTextFrame2PPM(this);
+
+	isFirstRun = true;
 }
 
 void TextFrame2PPM::createEmptyFrame(void)
@@ -67,15 +69,22 @@ void TextFrame2PPM::createEmptyFrame(void)
 int TextFrame2PPM::main(void)
 {
 	//entry point
-	  if(pTextFrameQueue->isEmpty() == false)
-	  {
-	convert();
-	  }
+	if(pTextFrameQueue->isEmpty() == false)
+	{
+		convert();
+	}
 	return 0;
 }
 
 void TextFrame2PPM::convert()
 {
+	if(isFirstRun == true)
+	{
+		createEmptyFrame();
+		isFirstRun == false;
+	}
+
+
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
 	while(textFrame == NULL)
@@ -90,7 +99,7 @@ void TextFrame2PPM::convert()
 	int height = textFrame->getTextHeight();
 	int width = textFrame->getTextWidth();
 	unsigned char *buffer = textFrame->getText();
-//	char* testChar = " abc  bca  cab ";
+	//	char* testChar = " abc  bca  cab ";
 
 	Frame *outputFrame = NULL;
 	while(outputFrame == NULL)
@@ -102,9 +111,9 @@ void TextFrame2PPM::convert()
 			break;	//get empty frame : success
 		}
 	}
-//	Frame outputFrame;
-//    outputFrame.setBlankFrame( WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height );
-	
+	//	Frame outputFrame;
+	//    outputFrame.setBlankFrame( WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height );
+
 	for ( int i = 0 ; i < height ; i++ )
 	{
 		for ( int p = 0 ; p < HEIGHT_OF_FONTS ; p++ )
@@ -121,7 +130,7 @@ void TextFrame2PPM::convert()
 			}
 		}
 	}
-	
+
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
 }

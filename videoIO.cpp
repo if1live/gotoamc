@@ -103,12 +103,12 @@ VideoIO::~VideoIO()
 		free(pOutBuffer);
 }
 
-int VideoIO::main(int argc, char *argv[])
+bool VideoIO::init(int argc, char *argv[])
 {
 	int frameLimit = pContext->getFrameLimit();
 	
 	if(validateArg(argc, argv) == false)
-		exit(EXIT_FAILURE);;	//quit program
+		exit(EXIT_FAILURE);	//quit program
 
 	//open input codec & video
 	char *inputFilename = argv[1];
@@ -128,8 +128,16 @@ int VideoIO::main(int argc, char *argv[])
 		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 		pUnusedInputFrameStack->push(pInputFrame);
 	}
+	fprintf(stderr, "[video IO] codec initialize \n");
+
+	return true;
+}
+
+int VideoIO::main(int argc, char *argv[])
+{
+	init(argc, argv);
 	
-	
+	int frameLimit = pContext->getFrameLimit();
 	//read frame
 	for(int i = 0 ; i < frameLimit && isReadingComplete() == false; i++)
 		readFrame();

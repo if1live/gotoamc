@@ -34,6 +34,7 @@ public:
 	bool writeFrame(void);	//write a frame
 	bool saveFrame(Frame *_pFrame);	
 	bool isReadingComplete(void);
+	bool init(int argc, char *argv[]);	//initialize codec
 
 private:
 	//member function

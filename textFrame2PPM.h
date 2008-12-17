@@ -34,5 +34,5 @@ private :
 	FrameHeap *pOutputFrameHeap;
 	Stack<Frame *> *pUnusedOutputFrameStack;
 
-	
+	bool isFirstRun;	
 };
