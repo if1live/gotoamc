@@ -14,28 +14,11 @@ TextFrame2PPM::TextFrame2PPM()
 	{
 		fonts[i] = new Frame();	//frame of font image
 		
-		snprintf(buffer, sizeof(buffer)*32, "res/%d.ppm", i);
-		fonts[i]->openP3PPM(buffer);
+		snprintf(buffer, 31, "res/%d.ppm", i);
+		fonts[i]->openPPM(buffer);
 	}
 	delete[] buffer;
 
-/*	for (int i = 97 ; i < 100 ; i++ )
-    {
-		fonts[i] = new Frame();
-		
-		char* buff = new char[32];
-		snprintf( buff, sizeof( buff ), "%d.ppm", i );
-		fonts[i]->openP3PPM( buff );
-		delete[] buff;
-    }
-	
-	fonts[32] = new Frame();
-	
-	char* buff = new char[32];
-	snprintf( buff, sizeof( buff ), "%d.ppm", 32 );
-	fonts[32]->openP3PPM( buff );
-	delete[] buff;
-*/
 	//open font ppm file : END
 	
 	//get data structure point
@@ -46,7 +29,6 @@ TextFrame2PPM::TextFrame2PPM()
 
 	pOutputFrameHeap = pContext->getOutputFrameHeap();
 	pUnusedOutputFrameStack = pContext->getUnusedOutputFrameStack();
-
 	//create unused output frame
 	createEmptyFrame();
 
@@ -58,6 +40,8 @@ void TextFrame2PPM::createEmptyFrame(void)
 {
 	//get a text frame to get text width, text height
 	TextFrame *textFrame = NULL;
+	///TODO
+	
 	while(textFrame == NULL)
 	{
 		if(pTextFrameQueue->isEmpty() == false)
@@ -66,7 +50,6 @@ void TextFrame2PPM::createEmptyFrame(void)
 			break;
 		}
 	}
-
 
 	int frameLimit = pContext->getFrameLimit();
 	for(int i = 0 ; i < frameLimit ; i++)
@@ -84,12 +67,11 @@ void TextFrame2PPM::createEmptyFrame(void)
 int TextFrame2PPM::main(void)
 {
 	//entry point
-	if(pTextFrameQueue->isEmpty() == false)
-	{
-		convert();
-	}
-
-	return NULL;
+	  if(pTextFrameQueue->isEmpty() == false)
+	  {
+	convert();
+	  }
+	return 0;
 }
 
 void TextFrame2PPM::convert()

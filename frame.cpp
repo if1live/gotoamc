@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #include "frame.h"
 
 using namespace std;
@@ -236,29 +237,10 @@ bool Frame::setWhite(int _x, int _y)
 
 
 
-bool Frame::openP3PPM(char *_filename)
+bool Frame::openP3PPM(FILE* pFile)
 {
-	//if already allocate frame, return false(error code)
-	if(pFrame != NULL)
-		return false;
-
-	//if cannot open _filename, return false(error code)
-	//open only ascii ppm type P6
-	FILE *pFile = fopen(_filename, "r");
-	if(pFile == NULL)
-	{
-		fprintf(stderr, "cannot open file : %s\n", _filename);
-		return false;
-	}
-	else
-	{
-		printf("open image : %s\n", _filename);
-	}
-
-	//get header
-	//head must be "P3 19 33 255" style
-	fscanf(pFile, "P3 %d %d 255", &width, &height);
-	
+	fscanf(pFile, "%d %d 255", &width, &height);
+	 
 	//allocate frame
 	pFrame = avcodec_alloc_frame();
 	if(pFrame == NULL)
@@ -281,7 +263,7 @@ bool Frame::openP3PPM(char *_filename)
    			unsigned char r = (unsigned char) intR;
 			unsigned char g = (unsigned char) intG;
 			unsigned char b = (unsigned char) intB;
-
+			
 			//assign pixel data
 			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = r;
 			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = g;
@@ -332,17 +314,125 @@ bool Frame::saveP6PPM(char *_filename)
 
 bool Frame::openPPM(char *_filename)
 {
-	///TODO
+	//if already allocate frame, return false(error code)
+	if(pFrame != NULL)
+		return false;
+
+	//if cannot open _filename, return false(error code)
+	//open only ascii ppm type P6
+	FILE *pFile = fopen(_filename, "r");
+	if(pFile == NULL)
+	{
+		fprintf(stderr, "cannot open file : %s\n", _filename);
+		return false;
+	}
+	else
+	{
+		printf("open image : %s\n", _filename);
+	}
+
+	//get header
+	char type[3];
+	fscanf( pFile, "%s ", type );
+	
+	if ( strcmp( type, "P3" ) == 0 )
+		openP3PPM( pFile );
+	else if ( strcmp( type, "P4" ) == 0 )
+		openP4PPM( pFile );
+	else if ( strcmp( type, "P5" ) == 0 )
+		openP5PPM( pFile );
+	else
+	{
+		printf( "can't read type" );
+		return false;
+	}
 }
 
-bool Frame::openP4PPM(char *_filename)
+bool Frame::openP4PPM( FILE* pFile )
 {
-	///TODO
+	printf("open p4 PPM\n");
+	fscanf(pFile, "%d %d ", &width, &height);
+	 
+	//allocate frame
+	pFrame = avcodec_alloc_frame();
+	if(pFrame == NULL)
+		throw "Cannot allocate frame";
+	int numBytes = avpicture_get_size(PIX_FMT_RGB24, width, height);
+	buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
+
+	avpicture_fill((AVPicture *)pFrame, buffer, PIX_FMT_RGB24, width, height);
+
+	//get gray
+	uint8_t list;
+	int count = 8;
+
+	for(int y = 0 ; y < height ; y++)
+	{
+		for(int x = 0 ; x < width ; x++)
+		{
+			if ( count == 8 )
+			{
+				fread( &list, 1, 1, pFile );
+				count = 0;
+			}
+		    
+   			unsigned char gray = (unsigned char) (list & (1<<7));
+		    
+            		//assign pixel data
+            		int val;
+            		if(gray == 0)
+				val = 255;
+			else
+				val = 0;
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = val;
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = val;
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+2) = val;
+
+			list = list<<1;
+			count++;
+		}
+	}
+	
+	//close file
+	fclose(pFile);
+
+	return true;
 }
 
-bool Frame::openP5PPM(char *_filename)
+bool Frame::openP5PPM( FILE* pFile )
 {
-	///TODO
+	printf("open p5 PPM\n");
+	fscanf(pFile, "%d %d 255 ", &width, &height);
+	//allocate frame
+    pFrame = avcodec_alloc_frame();
+    if(pFrame == NULL)
+        throw "Cannot allocate frame";
+    int numBytes = avpicture_get_size(PIX_FMT_RGB24, width, height);
+    buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
+
+    avpicture_fill((AVPicture *)pFrame, buffer, PIX_FMT_RGB24, width, height);
+
+    //get gray
+    unsigned char gray;
+   
+    for(int y = 0 ; y < height ; y++)
+    {
+        for(int x = 0 ; x < width ; x++)
+        {
+            fread( &gray, 1, 1, pFile );
+           
+            //assign pixel data
+            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = gray;
+            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = gray;
+            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3+2) = gray;
+        }
+    }
+
+    //close file
+    fclose(pFile);
+
+    return true;
+
 }
 
 

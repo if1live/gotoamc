@@ -48,9 +48,9 @@ public:
 
 	//only ppm support
 	bool openPPM(char *_filename);
-	bool openP3PPM(char *_filename);
-	bool openP4PPM(char *_filename);
-	bool openP5PPM(char *_filename);
+	bool openP3PPM(FILE* pFile);
+	bool openP4PPM(FILE* pFile);
+	bool openP5PPM(FILE* pFile);
 
 	bool saveP3PPM(char *_filename);
 	bool saveP6PPM(char *_filename);
