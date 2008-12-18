@@ -17,17 +17,13 @@ int main(int argc, char *argv[])
 
 	videoIO->init(argc, argv);
 
-	while(videoIO->isReadingComplete() == false)
+//	while(videoIO->isReadingComplete() == false)
+	for(int i = 0 ; i < context->getFrameLimit() ; i++)
 	{
-		perror("0 ");
 		videoIO->readFrame();
-		perror("1 ");
 		frame2TextFrame->convertFrame();
-		perror("2 ");
 		textFrame2PPM->convert();
-		perror("3 ");
-		videoIO->writeFrame();
-		perror("4 \n");
+//		videoIO->writeFrame();
 	}
 
 	delete context;	//delete context data

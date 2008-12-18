@@ -43,8 +43,11 @@ private:
 
 	bool validateArg(int argc, char *argv[]);
 
-	bool openInputCodec(char *_filename);
-	bool openOutputCodec(char *_filename, int _width, int _height);
+	bool openInputCodec(void);
+	bool openOutputCodec(int _width, int _height);
+
+	char *inputFilename;
+	char *outputFilename;
 
 	void RGB24ToYUV420P(AVFrame *_src, int _width, int _height);
 	void YUV420PToRGB24(AVFrame *_dst, int _width, int _height);

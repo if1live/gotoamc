@@ -10,6 +10,8 @@
 VideoIO::VideoIO()
 {
 	frameIndex = 0;
+	inputFilename = NULL;
+	outputFilename = NULL;
 
 	//must be called before using avcodec lib
 	avcodec_init();
@@ -111,14 +113,14 @@ bool VideoIO::init(int argc, char *argv[])
 		exit(EXIT_FAILURE);	//quit program
 
 	//open input codec & video
-	char *inputFilename = argv[1];
-	bool openInputCodecReturn = openInputCodec(inputFilename);
+	inputFilename = argv[1];
+	bool openInputCodecReturn = openInputCodec();
 	if(openInputCodecReturn == false)
 		exit(EXIT_FAILURE);
 
-	//open output codec & video
-	char *outputFilename = argv[2];
-	openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
+	//set output file name;
+	outputFilename = argv[2];
+	//openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 
 	for(int i = 0 ; i < frameLimit ; i++)
 	{
@@ -138,8 +140,16 @@ int VideoIO::main(int argc, char *argv[])
 	init(argc, argv);
 	
 	int frameLimit = pContext->getFrameLimit();
+	for(int i = 0 ; i < frameLimit ; i++)
+	{
+		readFrame();
+		Frame *frame = pInputFrameQueue->pop();
+		pOutputFrameHeap->push(frame);
+		writeFrame();
+	}
+
 	//read frame
-	for(int i = 0 ; i < frameLimit && isReadingComplete() == false; i++)
+/*	for(int i = 0 ; i < frameLimit && isReadingComplete() == false; i++)
 		readFrame();
 	
 	while(pInputFrameQueue->isEmpty() == false)
@@ -156,17 +166,24 @@ int VideoIO::main(int argc, char *argv[])
 			fprintf(stderr, "[Except]%s", msg);
 		}
 	}
-	
 	while(pOutputFrameHeap->isEmpty() == false)
 	{
 		writeFrame();
 	}
-	
+*/	
 	return 0;
 }
 
 bool VideoIO::writeFrame(void)
 {
+	if(pOutputCodecCtx == NULL)
+	{
+		//open output codec
+		Frame *frame = pOutputFrameHeap->top();
+		int width = frame->getWidth();
+		int height = frame->getHeight();
+		openOutputCodec(width, height);
+	}
 	int w = pOutputCodecCtx->width;
 	int h = pOutputCodecCtx->height;
 	
@@ -224,13 +241,13 @@ bool VideoIO::validateArg(int argc, char *argv[])
 //return value
 //true : success
 //false : fail
-bool VideoIO::openInputCodec(char *_filename)
+bool VideoIO::openInputCodec(void)
 {
 	//open video file
 	///TODO : 20byte lost
-	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL) != 0)
+	if(av_open_input_file(&pFormatCtx, inputFilename, NULL, 0, NULL) != 0)
 	{
-		fprintf(stderr, "couldn't open file\n");
+		fprintf(stderr, "couldn't open file : %s\n", inputFilename);
 		return false;	//couldn't open file
 	}
 
@@ -242,7 +259,7 @@ bool VideoIO::openInputCodec(char *_filename)
 	}
 
 	//dump information about file onto standard error
-	dump_format(pFormatCtx, 0, _filename, 0);
+	dump_format(pFormatCtx, 0, inputFilename, 0);
 
 	//find the first video stream
 	videoStream = -1;
@@ -352,12 +369,12 @@ bool VideoIO::readFrame(void)
 	return true;
 }
 
-bool VideoIO::openOutputCodec(char *_filename, int _width, int _height)
+bool VideoIO::openOutputCodec(int _width, int _height)
 {
-	pOutputFile = fopen(_filename, "wb");
-	if(_filename == NULL)
+	pOutputFile = fopen(outputFilename, "wb");
+	if(pOutputFile == NULL)
 	{
-		fprintf(stderr, "could not open %s\n", _filename);
+		fprintf(stderr, "could not open %s\n", outputFilename);
 		exit(EXIT_FAILURE);
 	}
 
@@ -380,8 +397,8 @@ bool VideoIO::openOutputCodec(char *_filename, int _width, int _height)
 	//frame per second
 	pOutputCodecCtx->time_base = (AVRational){1,25};
 	pOutputCodecCtx->gop_size = 10;	//emit one intra frame every ten frames
-//	pOutputCodecCtx->time_base = pInputCodecCtx->time_base;
-//	pOutputCodecCtx->gop_size = pInputCodecCtx->gop_size;
+	//	pOutputCodecCtx->time_base = pInputCodecCtx->time_base;
+	//	pOutputCodecCtx->gop_size = pInputCodecCtx->gop_size;
 	pOutputCodecCtx->max_b_frames = 1;
 	pOutputCodecCtx->pix_fmt = PIX_FMT_YUV420P;
 
@@ -397,7 +414,6 @@ bool VideoIO::openOutputCodec(char *_filename, int _width, int _height)
 	outBufferSize = (_width) * (_height);
 	pOutBuffer = (uint8_t *) malloc (sizeof(uint8_t) * outBufferSize);
 
-
 	return true;
 }
 
@@ -407,7 +423,7 @@ bool VideoIO::saveFrame(Frame *_pFrame)
 	char filename[32];
 
 	int id = _pFrame->getId();
-	
+
 	//open file
 	sprintf(filename, "frame%02d.ppm", id);
 
@@ -424,7 +440,7 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	if(pOutputFrame == NULL)
 	{
 		pOutputFrame = avcodec_alloc_frame();
-		
+
 		uint8_t *buf = (uint8_t *) malloc (sizeof(uint8_t) * (size * 3) / 2);
 
 		pOutputFrame->data[0] = buf;
@@ -435,7 +451,7 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 		pOutputFrame->linesize[1] = w / 2;
 		pOutputFrame->linesize[2] = w / 2;
 	}
-	
+
 	//Y
 	for(int y = 0 ; y < h ; y++)
 	{
@@ -444,13 +460,13 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 			uint8_t r = *(_src->data[0] + y * _src->linesize[0] + (3*x));
 			uint8_t g = *(_src->data[0] + y * _src->linesize[0] + (3*x + 1));
 			uint8_t b = *(_src->data[0] + y * _src->linesize[0] + (3*x + 2));
-			
+
 			uint8_t resultY  = (0.257 * r) + (0.504 * g) + (0.098 * b) + 16;
-			
+
 			pOutputFrame->data[0][y * pOutputFrame->linesize[0] + x] = resultY;
 		}
 	}
-	
+
 	//Cb, Cr
 	for(int y = 0 ; y < h / 2 ; y++)
 	{

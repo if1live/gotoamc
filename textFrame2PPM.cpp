@@ -133,6 +133,9 @@ void TextFrame2PPM::convert()
 
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
+
+	//Test : get frame to ppm
+	outputFrame->saveP6PPM("test.ppm");
 }
 
 TextFrame2PPM::~TextFrame2PPM()
