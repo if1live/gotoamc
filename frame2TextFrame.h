@@ -21,6 +21,7 @@ public:
 private:
 	Context* pContext;
 	Queue<Frame *>* pInputFrameQueue;
+	Stack<Frame *>* pUnusedInputFrameStack;
 	Stack<TextFrame *>* pUnusedTextFrameStack;
 	Queue<TextFrame *>* pTextFrameQueue;
 };

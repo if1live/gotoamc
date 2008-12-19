@@ -14,6 +14,8 @@ Frame2TextFrame::Frame2TextFrame()
 
 	// get text frame queue
 	pTextFrameQueue = pContext->getTextFrameQueue();	
+
+	pUnusedInputFrameStack = pContext->getUnusedInputFrameStack();
 }
 
 Frame2TextFrame::~Frame2TextFrame()
@@ -33,7 +35,8 @@ void Frame2TextFrame::conversionLoop(void)
 	while(!pInputFrameQueue->isEmpty())
 	{
 		pFrame = pInputFrameQueue->pop();
-		convertFrame(pFrame);	
+		convertFrame(pFrame);
+		pUnusedInputFrameStack->push(pFrame);
 	}
 }
 
@@ -42,10 +45,12 @@ void Frame2TextFrame::convertFrame(void)
 	Frame *frame = NULL;
 	frame = pInputFrameQueue->pop();
 	convertFrame(frame);
+	pUnusedInputFrameStack->push(frame);
 }
 
 void Frame2TextFrame::convertFrame(Frame* _pFrame)
 {
+
 	TextFrame* pTextFrame;
 	if(pUnusedTextFrameStack->isEmpty())
 		pTextFrame = new TextFrame();
@@ -116,4 +121,5 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	int id = _pFrame->getId();
 	pTextFrame->setId(id);
 	pTextFrameQueue->push(pTextFrame);
+	
 }

@@ -8,9 +8,6 @@ int main(int argc, char *argv[])
 {
 	Context *context = Context::instance();	//create global data
 
-//	VideoIO *videoIO = new VideoIO();
-//	videoIO->main(argc, argv);
-
 	VideoIO *videoIO = new VideoIO();
 	Frame2TextFrame *frame2TextFrame = new Frame2TextFrame();
 	TextFrame2PPM *textFrame2PPM = new TextFrame2PPM();

@@ -148,29 +148,6 @@ int VideoIO::main(int argc, char *argv[])
 		writeFrame();
 	}
 
-	//read frame
-/*	for(int i = 0 ; i < frameLimit && isReadingComplete() == false; i++)
-		readFrame();
-	
-	while(pInputFrameQueue->isEmpty() == false)
-	{
-		Frame *frame;
-		try
-		{
-			frame = pInputFrameQueue->front();
-			pInputFrameQueue->pop();
-			pOutputFrameHeap->push(frame);
-		}
-		catch(const char *msg)
-		{
-			fprintf(stderr, "[Except]%s", msg);
-		}
-	}
-	while(pOutputFrameHeap->isEmpty() == false)
-	{
-		writeFrame();
-	}
-*/	
 	return 0;
 }
 

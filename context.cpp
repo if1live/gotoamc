@@ -10,7 +10,7 @@
 
 Context::Context()
 {
-	frameLimit = 10;
+	frameLimit = 5;
 	pOutputFrameHeap = new FrameHeap(frameLimit);
 	pInputFrameQueue = new Queue<Frame *>(frameLimit);
 	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit);
@@ -27,23 +27,42 @@ Context::~Context()
 {
 	if(pOutputFrameHeap != NULL)
 	{
-		fprintf(stderr, "[Context]OutputFrameHeap delete\n");
-		assert(pOutputFrameHeap->isEmpty() == true && "OutputFrameHeap is not empty!");
+		fprintf(stderr, "[Context]OutputFrameHeap delete...");
+		//	assert(pOutputFrameHeap->isEmpty() == true && "OutputFrameHeap is not empty!");
+		int i = 0;
+		while(pOutputFrameHeap->isEmpty() == false)
+		{
+			Frame *frame = pOutputFrameHeap->top();
+			fprintf(stderr, "%d ", i);
+			i++;
+			delete frame;
+			pOutputFrameHeap->pop();
+		}
 		delete pOutputFrameHeap;
 		pOutputFrameHeap = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 
 	if(pInputFrameQueue != NULL)
 	{
-		fprintf(stderr, "[Context]InputFrameQueue delete\n");
-		assert(pInputFrameQueue->isEmpty() == true && "InputFrameQueue is not empty!");
+		fprintf(stderr, "[Context]InputFrameQueue delete...");
+		//assert(pInputFrameQueue->isEmpty() == true && "InputFrameQueue is not empty!");
+		while(pInputFrameQueue->isEmpty() == false)
+		{
+			Frame *frame = pInputFrameQueue->front();
+			delete frame;
+			pInputFrameQueue->pop();
+		}
 		delete pInputFrameQueue;
 		pInputFrameQueue = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 
 	if(pUnusedInputFrameStack != NULL)
 	{
-		fprintf(stderr, "[Context]UnusedInputFrameStack delete\n");
+		fprintf(stderr, "[Context]UnusedInputFrameStack delete...");
 		while(pUnusedInputFrameStack->isEmpty() == false)
 		{
 			Frame *frame = pUnusedInputFrameStack->top();
@@ -52,11 +71,13 @@ Context::~Context()
 		}
 		delete pUnusedInputFrameStack;
 		pUnusedInputFrameStack = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 	
 	if(pUnusedOutputFrameStack != NULL)
 	{
-		fprintf(stderr, "[Context]UnusedOutputFrameStack delete\n");
+		fprintf(stderr, "[Context]UnusedOutputFrameStack delete...");
 		while(pUnusedOutputFrameStack->isEmpty() == false)
 		{
 			Frame *frame = pUnusedOutputFrameStack->top();
@@ -65,19 +86,29 @@ Context::~Context()
 		}
 		delete pUnusedOutputFrameStack;
 		pUnusedOutputFrameStack = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 	
 	if(pTextFrameQueue != NULL)
 	{
-		fprintf(stderr, "[Context]TextFrameQueue delete\n");
-		assert(pTextFrameQueue->isEmpty() == true && "TextFrameQueue is not empty!");
+		fprintf(stderr, "[Context]TextFrameQueue delete...");
+		//assert(pTextFrameQueue->isEmpty() == true && "TextFrameQueue is not empty!");
+		while(pTextFrameQueue->isEmpty() == false)
+		{
+			TextFrame *textFrame = pTextFrameQueue->front();
+			delete textFrame;
+			pTextFrameQueue->pop();
+		}
 		delete pTextFrameQueue;
 		pTextFrameQueue = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 
 	if(pUnusedTextFrameStack != NULL)
 	{
-		fprintf(stderr, "[Context]UnusedTextFrameStack delete\n");
+		fprintf(stderr, "[Context]UnusedTextFrameStack delete...");
 		while(pUnusedTextFrameStack->isEmpty() == false)
 		{
 			TextFrame *textFrame = pUnusedTextFrameStack->top();
@@ -86,25 +117,30 @@ Context::~Context()
 		}
 		delete pUnusedTextFrameStack;
 		pUnusedTextFrameStack = NULL;
+
+		fprintf(stderr, "complete\n");
 	}
 
 	if(pVideoIO != NULL)
 	{
-		fprintf(stderr, "[Context]VideoIO delete\n");
+		fprintf(stderr, "[Context]VideoIO delete...");
 		delete pVideoIO;
+		fprintf(stderr, "complete\n");
 	}
 
 
 	if(pTextFrame2PPM != NULL)
 	{
-		fprintf(stderr, "[Context]TextFrame2PPM delete\n");
+		fprintf(stderr, "[Context]TextFrame2PPM delete...");
 		delete pTextFrame2PPM;
+		fprintf(stderr, "complete\n");
 	}
 
 	if(pFrame2TextFrame != NULL)
 	{
-		fprintf(stderr, "[Context]Frame2TextFrame delete\n");
+		fprintf(stderr, "[Context]Frame2TextFrame delete...");
 		delete pFrame2TextFrame;
+		fprintf(stderr, "complete\n");
 	}
 }
 
