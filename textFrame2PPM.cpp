@@ -40,6 +40,9 @@ TextFrame2PPM::TextFrame2PPM()
 
 void TextFrame2PPM::createEmptyFrame(void)
 {
+	//DEBUG
+	printf("[TextFrame2PPM] create Empty Frame....");
+
 	//get a text frame to get text width, text height
 	TextFrame *textFrame = NULL;
 	///TODO
@@ -64,6 +67,9 @@ void TextFrame2PPM::createEmptyFrame(void)
 		frame->setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
 		pUnusedOutputFrameStack->push(frame);
 	}
+
+	//DEBUG
+	printf("complete\n");
 }
 
 int TextFrame2PPM::main(void)
@@ -84,6 +90,8 @@ void TextFrame2PPM::convert()
 		isFirstRun == false;
 	}
 
+	//DEBUG
+	printf("[TextFrame2PPM] convert...");
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
@@ -124,15 +132,22 @@ void TextFrame2PPM::convert()
 				{
 					int rgb = fonts[buffer[i*width + j]]->getRGB(q, p);
 					unsigned char value = 0x000000ff & rgb;
-
+					
 					outputFrame->setGrey( q + j*WIDTH_OF_FONTS, p + i*HEIGHT_OF_FONTS, value );
 				}
 			}
 		}
 	}
 
+	//save frame to data structure
+	int id = textFrame->getId();
+	outputFrame->setId(id);
+
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
+
+	//DEBUG
+	printf("complete\n");
 
 	//Test : get frame to ppm
 	outputFrame->saveP6PPM("test.ppm");

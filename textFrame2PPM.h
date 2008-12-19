@@ -2,8 +2,8 @@
 #include "textFrame.h"
 
 #define MAX_OF_FONTS 128
-#define WIDTH_OF_FONTS 16 //19
-#define HEIGHT_OF_FONTS 16 //33
+#define WIDTH_OF_FONTS 8 //19
+#define HEIGHT_OF_FONTS 8 //33
 
 class Context;
 class FrameHeap;

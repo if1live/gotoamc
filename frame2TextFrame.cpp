@@ -56,18 +56,26 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	
 	aa_context *c;	// aa context
 
+	//register font
+//	aa_registerfont(aa_font8);
+
 	// get width and height and save to TextFrame
 	int width = _pFrame->getWidth();
 	int height = _pFrame->getHeight();
 	pTextFrame->setWidth(width);
 	pTextFrame->setHeight(height);
-	
+
 	// set hardware params. for aalib
 	hParams = aa_defparams;
-	hParams.minwidth = width/2;
-	hParams.minheight = height/2;
-	hParams.maxwidth = width/2 - (width/2)%100 + 100;
-	hParams.maxheight = width/2 - (width/2)%100 + 100;
+//	hParams.minwidth = width/2;
+//	hParams.minheight = height/2;
+//	hParams.maxwidth = width/2 - (width/2)%100 + 100;
+//	hParams.maxheight = width/2 - (width/2)%100 + 100;
+//	hParams.minwidth = width / 2;
+//	hParams.minheight = height / 2;
+	hParams.width = width / 2;
+	hParams.height = height / 2;
+//	hParams.font = &aa_fontline;
 
 	// copy mem_d to prevent collision
 	aa_driver aa_md;
@@ -105,5 +113,7 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	aa_close(c);	// close used aa context
 
 	// push to the text frame queue
+	int id = _pFrame->getId();
+	pTextFrame->setId(id);
 	pTextFrameQueue->push(pTextFrame);
 }

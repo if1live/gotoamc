@@ -42,7 +42,7 @@ Frame::Frame(AVCodecContext *_pCodecCtx, int _type)
 
 		width = _pCodecCtx->width;
 		height = _pCodecCtx->height;
-	   
+
 		//determine required buffer size and allocate buffer
 		int numBytes = avpicture_get_size(_type, width, height);
 		buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
@@ -188,14 +188,14 @@ int Frame::getRGB(int _x, int _y)
 	unsigned char r = *(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3));
 	unsigned char g = *(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 1));
 	unsigned char b = *(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 2));
-	
+
 	int intR = 0xff & r;
 	int intG = 0xff & g;
 	int intB = 0xff & b;
-	
+
 	intR = intR << 16;
 	intG = intG << 8;
-	
+
 	int rgb = intR | intG | intB;
 	return rgb;
 }
@@ -207,7 +207,7 @@ bool Frame::setGrey(int _x, int _y, unsigned char _value)
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3)) = _value;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 1)) = _value;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 2)) = _value;
-	
+
 	return true;
 }
 
@@ -219,7 +219,7 @@ bool Frame::setBlack(int _x, int _y)
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3)) = (unsigned char) 0;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 1)) = (unsigned char) 0;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 2)) = (unsigned char) 0;
-	
+
 	return true;
 }
 
@@ -231,7 +231,7 @@ bool Frame::setWhite(int _x, int _y)
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3)) = (unsigned char) 255;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 1)) = (unsigned char) 255;
 	*(pFrame->data[0] + _y*pFrame->linesize[0] + (_x*3 + 2)) = (unsigned char) 255;
-	
+
 	return true;
 }
 
@@ -240,7 +240,7 @@ bool Frame::setWhite(int _x, int _y)
 bool Frame::openP3PPM(FILE* pFile)
 {
 	fscanf(pFile, "%d %d 255", &width, &height);
-	 
+
 	//allocate frame
 	pFrame = avcodec_alloc_frame();
 	if(pFrame == NULL)
@@ -260,17 +260,17 @@ bool Frame::openP3PPM(FILE* pFile)
 			fscanf(pFile, "%d", &intG);
 			fscanf(pFile, "%d", &intB);
 
-   			unsigned char r = (unsigned char) intR;
+			unsigned char r = (unsigned char) intR;
 			unsigned char g = (unsigned char) intG;
 			unsigned char b = (unsigned char) intB;
-			
+
 			//assign pixel data
 			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = r;
 			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = g;
 			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+2) = b;
 		}
 	}
-	
+
 	//close file
 	fclose(pFile);
 
@@ -289,14 +289,14 @@ bool Frame::saveP6PPM(char *_filename)
 	FILE *pFile = fopen(_filename, "wb");
 	if(pFile == NULL)
 	{
-		fprintf(stderr, "cannot write ppm file\n");
+		fprintf(stderr, "cannot write ppm file : %s\n", _filename);
 		return false;
 	}
 	else
 	{
-		printf("write image : %s\n", _filename);
+		printf("write image : %s(%d, %d)....", _filename, width, height);
 	}
-	
+
 	//write header
 	fprintf(pFile, "P6\n%d %d\n255\n", width, height);
 
@@ -308,7 +308,7 @@ bool Frame::saveP6PPM(char *_filename)
 
 	//close file
 	fclose(pFile);
-
+	printf("complete\n");
 	return true;
 }
 
@@ -328,13 +328,13 @@ bool Frame::openPPM(char *_filename)
 	}
 	else
 	{
-		printf("open image : %s\n", _filename);
+		printf("open image : %s.....", _filename);
 	}
 
 	//get header
 	char type[3];
 	fscanf( pFile, "%s ", type );
-	
+
 	if ( strcmp( type, "P3" ) == 0 )
 		openP3PPM( pFile );
 	else if ( strcmp( type, "P4" ) == 0 )
@@ -352,7 +352,7 @@ bool Frame::openP4PPM( FILE* pFile )
 {
 	printf("open p4 PPM\n");
 	fscanf(pFile, "%d %d ", &width, &height);
-	 
+
 	//allocate frame
 	pFrame = avcodec_alloc_frame();
 	if(pFrame == NULL)
@@ -375,12 +375,12 @@ bool Frame::openP4PPM( FILE* pFile )
 				fread( &list, 1, 1, pFile );
 				count = 0;
 			}
-		    
-   			unsigned char gray = (unsigned char) (list & (1<<7));
-		    
-            		//assign pixel data
-            		int val;
-            		if(gray == 0)
+
+			unsigned char gray = (unsigned char) (list & (1<<7));
+
+			//assign pixel data
+			int val;
+			if(gray == 0)
 				val = 255;
 			else
 				val = 0;
@@ -392,7 +392,7 @@ bool Frame::openP4PPM( FILE* pFile )
 			count++;
 		}
 	}
-	
+
 	//close file
 	fclose(pFile);
 
@@ -404,34 +404,34 @@ bool Frame::openP5PPM( FILE* pFile )
 	printf("open p5 PPM\n");
 	fscanf(pFile, "%d %d 255 ", &width, &height);
 	//allocate frame
-    pFrame = avcodec_alloc_frame();
-    if(pFrame == NULL)
-        throw "Cannot allocate frame";
-    int numBytes = avpicture_get_size(PIX_FMT_RGB24, width, height);
-    buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
+	pFrame = avcodec_alloc_frame();
+	if(pFrame == NULL)
+		throw "Cannot allocate frame";
+	int numBytes = avpicture_get_size(PIX_FMT_RGB24, width, height);
+	buffer = (uint8_t *) av_malloc (sizeof(uint8_t) * numBytes);
 
-    avpicture_fill((AVPicture *)pFrame, buffer, PIX_FMT_RGB24, width, height);
+	avpicture_fill((AVPicture *)pFrame, buffer, PIX_FMT_RGB24, width, height);
 
-    //get gray
-    unsigned char gray;
-   
-    for(int y = 0 ; y < height ; y++)
-    {
-        for(int x = 0 ; x < width ; x++)
-        {
-            fread( &gray, 1, 1, pFile );
-           
-            //assign pixel data
-            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = gray;
-            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = gray;
-            *(pFrame->data[0] + y*pFrame->linesize[0] + x*3+2) = gray;
-        }
-    }
+	//get gray
+	unsigned char gray;
 
-    //close file
-    fclose(pFile);
+	for(int y = 0 ; y < height ; y++)
+	{
+		for(int x = 0 ; x < width ; x++)
+		{
+			fread( &gray, 1, 1, pFile );
 
-    return true;
+			//assign pixel data
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3) = gray;
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+1) = gray;
+			*(pFrame->data[0] + y*pFrame->linesize[0] + x*3+2) = gray;
+		}
+	}
+
+	//close file
+	fclose(pFile);
+
+	return true;
 
 }
 
@@ -446,14 +446,14 @@ bool Frame::saveP3PPM(char *_filename)
 	FILE *pFile = fopen(_filename, "wb");
 	if(pFile == NULL)
 	{
-		fprintf(stderr, "cannot write ppm file\n");
+		fprintf(stderr, "cannot write ppm file : %s\n", _filename);
 		return false;
 	}
 	else
 	{
-		printf("write image : %s\n", _filename);
+		printf("write image : %s(%d, %d)....", _filename, width, height);
 	}
-	
+
 	//write header
 	fprintf(pFile, "P3\n%d %d\n255\n", width, height);
 
@@ -463,17 +463,17 @@ bool Frame::saveP3PPM(char *_filename)
 		for(int x = 0 ; x < width ; x++)
 		{
 			int rgb = getRGB(x, y);
-			
+
 			unsigned char r = (0x00ff0000 & rgb) >> 16;
 			unsigned char g = (0x0000ff00 & rgb) >> 8;
 			unsigned char b = (0x000000ff & rgb);
-			
+
 			fprintf(pFile, "%d %d %d\n", r, g, b);
 		}
 	}
 
 	//close file
 	fclose(pFile);
-
+	printf("complete\n");
 	return true;
 }

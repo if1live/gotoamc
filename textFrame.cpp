@@ -14,6 +14,17 @@ TextFrame::~TextFrame()
 	clearText();
 }
 
+int TextFrame::getId(void)
+{
+	return this->id;
+}
+
+void TextFrame::setId(int _id)
+{
+	this->id = _id;
+}
+
+
 int TextFrame::getWidth(void)
 {
 	return this->width;

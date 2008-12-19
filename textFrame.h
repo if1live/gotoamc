@@ -17,6 +17,8 @@ public:
 	void setText(unsigned char* _text);	// set text.
 	void clearText(void); // clear saved text
 	void print(void);	// for debugging purpose
+	int getId(void);
+	void setId(int _id);
 private:
 	unsigned char *text;	// converted data
 	int width;	//width of original frame
@@ -24,4 +26,5 @@ private:
 	int textWidth;		// aa width
 	int textHeight;		// aa height
 
+	int id;	//text frame id
 };
