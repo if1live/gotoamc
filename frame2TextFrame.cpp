@@ -60,9 +60,7 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	aa_hardware_params hParams;	// hardware params for aalib
 	
 	aa_context *c;	// aa context
-
-	//register font
-//	aa_registerfont(aa_font8);
+//	aa_recommendhidisplay("teste1");
 
 	// get width and height and save to TextFrame
 	int width = _pFrame->getWidth();
@@ -106,9 +104,11 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 			aa_putpixel(c, i, j,(unsigned char)((((rgbValue&RMASK) >> 16)*0.30)+(((rgbValue&GMASK) >> 8)*0.59) + ((rgbValue&BMASK)*0.11)));
 		}
 	}
+
 	// render into ascii art
 	int textWidth = aa_scrwidth(c);
 	int textHeight = aa_scrheight(c);
+
 	pTextFrame->setTextWidth(textWidth);	// save text width
 	pTextFrame->setTextHeight(textHeight);	// save text height
 	aa_render(c, &aa_rp, 0, 0, textWidth, textHeight);

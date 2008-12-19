@@ -4,9 +4,10 @@
 #include "context.h"
 #include "frameHeap.h"
 
-
 TextFrame2PPM::TextFrame2PPM()
 {
+	ratio = 4;	//resize factor	
+	textBuffer = NULL;
 	//open font ppm file : BEGIN
 	char *buffer = new char[32];
 	
@@ -57,16 +58,20 @@ void TextFrame2PPM::createEmptyFrame(void)
 	}
 
 	int frameLimit = pContext->getFrameLimit();
+	int width;
+	int height;
 	for(int i = 0 ; i < frameLimit ; i++)
 	{
-		int width = textFrame->getTextWidth();
-		int height = textFrame->getTextHeight();
+		width = textFrame->getTextWidth() / ratio;
+		height = textFrame->getTextHeight() / ratio;
 
 		//create frame
 		Frame *frame = new Frame();
 		frame->setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
 		pUnusedOutputFrameStack->push(frame);
 	}
+
+	textBuffer = new unsigned char [height * width];
 
 	//DEBUG
 	printf("complete\n");
@@ -87,11 +92,9 @@ void TextFrame2PPM::convert()
 	if(isFirstRun == true)
 	{
 		createEmptyFrame();
-		isFirstRun == false;
+		isFirstRun = false;
 	}
 
-	//DEBUG
-	printf("[TextFrame2PPM] convert...");
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
@@ -104,10 +107,30 @@ void TextFrame2PPM::convert()
 		}
 	}
 
+	//DEBUG
+	printf("[TextFrame2PPM] #%d convert...", textFrame->getId());
+
 	int height = textFrame->getTextHeight();
 	int width = textFrame->getTextWidth();
 	unsigned char *buffer = textFrame->getText();
-	//	char* testChar = " abc  bca  cab ";
+	//	char* testChar = " abc  bca  cab "
+	
+	//resize text frame(buffer)
+	int pos = 0;
+	for(int y = 0 ; y < height ; y++)
+	{
+		for(int x = 0 ; x < width ; x++)
+		{
+			if(y % ratio == 0 && x % ratio == 0)
+			{
+				textBuffer[pos] = *(buffer + y*width + x);
+				pos++;
+			}
+		}
+	}
+	height = height / ratio;
+	width = width / ratio;
+
 
 	Frame *outputFrame = NULL;
 	while(outputFrame == NULL)
@@ -130,7 +153,8 @@ void TextFrame2PPM::convert()
 			{
 				for ( int q = 0 ; q < WIDTH_OF_FONTS ; q++ )
 				{
-					int rgb = fonts[buffer[i*width + j]]->getRGB(q, p);
+					//int rgb = fonts[buffer[i*width + j]]->getRGB(q, p);
+					int rgb = fonts[textBuffer[i*width + j]]->getRGB(q, p);
 					unsigned char value = 0x000000ff & rgb;
 					
 					outputFrame->setGrey( q + j*WIDTH_OF_FONTS, p + i*HEIGHT_OF_FONTS, value );
@@ -150,7 +174,7 @@ void TextFrame2PPM::convert()
 	printf("complete\n");
 
 	//Test : get frame to ppm
-	outputFrame->saveP6PPM("test.ppm");
+	//outputFrame->saveP6PPM("test.ppm");
 }
 
 TextFrame2PPM::~TextFrame2PPM()
@@ -158,6 +182,12 @@ TextFrame2PPM::~TextFrame2PPM()
 	//free font image
 	for ( int i = 0 ; i < MAX_OF_FONTS ; i++ )
 		delete fonts[i];
+
+	if(textBuffer == NULL)
+	{
+		delete textBuffer;
+		textBuffer = NULL;
+	}
 }
 
 

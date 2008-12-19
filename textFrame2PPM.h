@@ -34,5 +34,8 @@ private :
 	FrameHeap *pOutputFrameHeap;
 	Stack<Frame *> *pUnusedOutputFrameStack;
 
-	bool isFirstRun;	
+	bool isFirstRun;
+	int ratio;	//resize factor
+
+	unsigned char *textBuffer;
 };
