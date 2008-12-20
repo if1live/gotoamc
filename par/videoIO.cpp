@@ -290,16 +290,6 @@ bool VideoIO::readFrame(void)
 	//else...continue read frame from video
 	bool readSuccess = false;
 	
-	Frame *pInputFrame = NULL;
-	if(pUnusedInputFrameStack->isEmpty() == true)
-	{
-		pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
-	}
-	else
-	{
-		pInputFrame = pUnusedInputFrameStack->pop();
-	}
-
 	while(readSuccess != true && readComplete == false)
 	{
 		if(av_read_frame(pFormatCtx, &packet) >= 0)
@@ -308,7 +298,7 @@ bool VideoIO::readFrame(void)
 			if(packet.stream_index == videoStream)
 			{
 				//decode video frame
-				avcodec_decode_video(pInputCodecCtx, pInputFrame->getFrame(), &frameFinished,
+				avcodec_decode_video(pInputCodecCtx, pInputFrame, &frameFinished,
 									 packet.data, packet.size);
 				
 				//did we get a frame?
@@ -319,16 +309,14 @@ bool VideoIO::readFrame(void)
 					int h = pInputCodecCtx->height;
 					
 					Frame *frame = NULL;
-					while(frame == NULL)
+					if(pUnusedInputFrameStack->isEmpty() == true)
 					{
-						if(pUnusedInputFrameStack->isEmpty() == false)
-						{
-							frame = pUnusedInputFrameStack->top();
-							pUnusedInputFrameStack->pop();
-							break;	//get frame : success
-						}
+						frame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 					}
-
+					else
+					{
+						frame = pUnusedInputFrameStack->pop();
+					}
 
 					//convert YUV420P->RGB24
 					YUV420PToRGB24(frame->getFrame(), w, h);
