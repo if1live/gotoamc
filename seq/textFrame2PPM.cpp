@@ -57,10 +57,9 @@ void TextFrame2PPM::createEmptyFrame(void)
 		}
 	}
 
-	int frameLimit = pContext->getFrameLimit();
 	int width;
 	int height;
-	for(int i = 0 ; i < frameLimit ; i++)
+	for(int i = 0 ; i < 10 ; i++)
 	{
 		width = textFrame->getTextWidth() / ratio;
 		height = textFrame->getTextHeight() / ratio;

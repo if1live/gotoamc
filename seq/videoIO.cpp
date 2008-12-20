@@ -107,8 +107,6 @@ VideoIO::~VideoIO()
 
 bool VideoIO::init(int argc, char *argv[])
 {
-	int frameLimit = pContext->getFrameLimit();
-	
 	if(validateArg(argc, argv) == false)
 		exit(EXIT_FAILURE);	//quit program
 
@@ -122,7 +120,7 @@ bool VideoIO::init(int argc, char *argv[])
 	outputFilename = argv[2];
 	//openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 
-	for(int i = 0 ; i < frameLimit ; i++)
+	for(int i = 0 ; i < 10 ; i++)
 	{
 		//assign appropriate parts of buffer to image planes in pFrameRGB
 		//note that pFrameRGB is an AVFrame, bug AVFrame is a superset of AVPicture
