@@ -7,15 +7,18 @@
 	unsigned int height;	// height of frame
 	uint64_t AVFAddress;	// address of AVFrame
 	unsigned int sizeOfAVF;	// size of AVFrame
+	uint64_t arrayAddressY;	// address of array for saving yvalues
+	unsigned int sizeOfop;	// size of array
+	uint64_t arrayAddressCr;// address of array for saving Crvalues
+	uint64_t arrayAddressCb;// address of array for saving Cbvalues
 } control_block; */
 
-int main( unsigned long long spe_id, unsigned long long argp, unsigned long long envp )
+int main( unsigned long long speid, unsigned long long argp, unsigned long long envp )
 {
 	int x, y, i=-1, j=-1;
 	control_block cb;
-	AVFrame* src;
-	AVFrame* output;
-	uint8_t* buf = (uint8_t*) malloc( sizeof( uint8_t ) * ( size * 3 ) / 2 );
+	AVFrame src;
+	AVFrame output;
 	vector unsigned int* rVal;
 	vector unsigned int* gVal;
 	vector unsigned int* bVal;
@@ -37,22 +40,18 @@ int main( unsigned long long spe_id, unsigned long long argp, unsigned long long
 	vector unsigned float rVal2C;
 	vector unsigned float gVal2C;
 	vector unsigned float bVal2C;
+	uint8_t y;
+	uint8_t Cr;
+	uint8_t Cb;
 	
 
 	mfc_get( &cb, argp, sizeof( cb ), 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
 
-	mfc_get( src, cb.AVFAddress, cb.sizeOfAVF, 31, 0, 0 );
+	mfc_get( &src, cb.AVFAddress, cb.sizeOfAVF, 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
-
-	output->data[0] = buf;
-	output->data[1] = output->data[0] + ( cb.width * cb.height );
-	output->data[2] = output->data[1] + ( ( cb.width * cb.height ) / 4 );
-	output->linesize[0] = cb.width;
-	output->linesize[1] = cb.width / 2;
-	output->linesize[2] = cb.width / 2;
 
 	rVal = (vector unsigned int*) malloc( sizeof( vector unsigned int ) * cb.width * cb.height / 4 );
 	bVal = (vector unsigned int*) malloc( sizeof( vector unsigned int ) * cb.width * cb.height / 4 ); 
@@ -68,21 +67,21 @@ int main( unsigned long long spe_id, unsigned long long argp, unsigned long long
 	{
 		for ( x = 0 ; x < cb.width ; x++ )
 		{
-			if ( ( x + ( y * cb.height ) % 4 ) == 0 )
+			if ( ( x + ( y * cb.height ) ) % 4 == 0 )
 			{			
 				i++;
 				if ( y < (cb.height / 2) && x < (cb.width / 2) )
 					 j++;
 			}
 			
-			rVal[i] = spu_promote( *(src->data[0] + y * src->linesize[0] + (3*x)), ( x + ( y * cb.height ) ) % 4 );
-			gVal[i] = spu_promote( *(src->data[0] + y * src->linesize[0] + (3*x + 1)), ( x + ( y * cb.height ) ) % 4 ); 
-			bVal[i] = spu_promote( *(src->data[0] + y * src->linesize[0] + (3*x + 2)), ( x + ( y * cb.height ) ) % 4 );
+			rVal[i] = spu_promote( src.data[0] + y * src.linesize[0] + (3*x), ( x + ( y * cb.height ) ) % 4 );
+			gVal[i] = spu_promote( src.data[0] + y * src.linesize[0] + (3*x + 1), ( x + ( y * cb.height ) ) % 4 ); 
+			bVal[i] = spu_promote( src.data[0] + y * src.linesize[0] + (3*x + 2), ( x + ( y * cb.height ) ) % 4 );
 			if ( y < (cb.height / 2) && x < (cb.width / 2) )
 			{
-				rVal2[j] = spu_promote( *(src->data[0] + y * 2 * src->linesize[0] + (3*2*x)), ( x + ( y * cb.height ) ) % 4 );
-				gVal2[j] = spu_promote( *(src->data[0] + y * 2 * src->linesize[0] + (3*2*x + 1)), ( x + ( y * cb.height ) ) % 4 ); 
-				bVal2[j] = spu_promote( *(src->data[0] + y * 2 * src->linesize[0] + (3*2*x + 2)), ( x + ( y * cb.height ) ) % 4 );
+				rVal2[j] = spu_promote( src.data[0] + y * 2 * src.linesize[0] + (3*2*x), ( x + ( y * cb.height ) ) % 4 );
+				gVal2[j] = spu_promote( src.data[0] + y * 2 * src.linesize[0] + (3*2*x + 1), ( x + ( y * cb.height ) ) % 4 ); 
+				bVal2[j] = spu_promote( src.data[0] + y * 2 * src.linesize[0] + (3*2*x + 2), ( x + ( y * cb.height ) ) % 4 );
 			}
 		}
 	}
@@ -109,29 +108,38 @@ int main( unsigned long long spe_id, unsigned long long argp, unsigned long long
 		CrVal[j] = spu_add( CrVal[j], 128 );
 	}
 	
-	i = j = 0;
+	i = j = -1;
 			
 	for ( y = 0 ; y < cb.height ; y++ )
 	{
 		for ( x = 0 ; x < cb.width ; x++ )
 		{
-			if ( ( x + ( y * cb.height ) % 4 ) == 0 )
-			{			
-				i++;
-				if ( y < (cb.height / 2) && x < (cb.width / 2) )
-					 j++;
-			}
+			if ( ( x + ( y * cb.height ) ) % 4  == 0 )
+		   		i++;
 			
-			output->data[0][y * output->linesize[0] + x] = spu_extract( yVal[i], ( x + ( y * cb.height ) ) % 4 );
-			if ( y < (cb.height / 2) && x < (cb.width / 2) )
-			{
-				output->data[1][y * output->linesize[1] + x] = spu_extract( CrVal[j], ( x + ( y * cb.height ) ) % 4 );
-				output->data[2][y * output->linesize[2] + x] = spu_extract( CbVal[j], ( x + ( y * cb.height ) ) % 4 );
-			}
+			y = spu_extract( yVal[i], ( x + ( y * cb.height ) ) % 4 );
+			mfc_put( &y, cb.arrayAddressY + sizeof( uint8_t ) * ( x + ( y * cb.height ) ), 31, 0, 0 );
+			mfc_write_tag_mask( 1<<31 );
+			mfc_read_tag_status_all();
 		}
 	}
-	
-	free( buf );
+
+	for ( y = 0 ; y < cb.height / 2 ; y++ )
+	{
+		for ( x = 0 ; x < cb.width / 2 ; x++ )
+		{
+			if ( ( x + ( y * cb.height / 2 ) ) % 4 == 0 )
+				j++;
+			
+			Cr = spu_extract( CrVal[j], ( x + ( y * cb.height ) ) % 4 );
+			Cb = spu_extract( CbVal[j], ( x + ( y * cb.height ) ) % 4 );
+			mfc_put( &Cr, cb.arrayAddressCr + sizeof( uint8_t ) * ( x + ( y * cb.height / 2 ) ), 31, 0, 0 );
+			mfc_put( &Cb, cb.arrayAddressCb + sizeof( uint8_t ) * ( x + ( y * cb.height / 2 ) ), 31, 0, 0 );
+			mfc_write_tag_mask( 1<<31 );
+			mfc_read_tag_status_all();
+		}
+	}
+
 	free( rVal );
 	free( bVal );
 	free( gVal );
@@ -141,6 +149,6 @@ int main( unsigned long long spe_id, unsigned long long argp, unsigned long long
 	free( yVal );
 	free( CbVal );
 	free( CrVal );
-
-	mfc_put( output, 
+	
+	return 0;
 }
