@@ -20,9 +20,9 @@ public :
 
 	int main(void);	//entry point
 	~TextFrame2PPM();
-	
-private :
 	void createEmptyFrame(void);
+
+private :
 
 	Frame *fonts[MAX_OF_FONTS];
 	
@@ -34,8 +34,8 @@ private :
 	FrameHeap *pOutputFrameHeap;
 	Stack<Frame *> *pUnusedOutputFrameStack;
 
-	bool isFirstRun;
 	int ratio;	//resize factor
 
 	unsigned char *textBuffer;
+	int outputFrameCount;	//how many image exist in outputFrameHeap?
 };

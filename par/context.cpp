@@ -10,7 +10,8 @@
 
 Context::Context()
 {
-	frameLimit = 100;
+	frameLimit = 5;
+	convertingRange = 10;
 	pOutputFrameHeap = new FrameHeap(frameLimit);
 	pInputFrameQueue = new Queue<Frame *>(frameLimit);
 	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit);
@@ -21,6 +22,8 @@ Context::Context()
 	pVideoIO = NULL;
 	pTextFrame2PPM = NULL;
 	pFrame2TextFrame = NULL;
+	width = -1;
+	height = -1;
 }
 
 Context::~Context()
@@ -31,9 +34,8 @@ Context::~Context()
 		//	assert(pOutputFrameHeap->isEmpty() == true && "OutputFrameHeap is not empty!");
 		while(pOutputFrameHeap->isEmpty() == false)
 		{
-			Frame *frame = pOutputFrameHeap->top();
-			delete frame;
-			pOutputFrameHeap->pop();
+			//write remain frame
+			pVideoIO->writeFrame();
 		}
 		delete pOutputFrameHeap;
 		pOutputFrameHeap = NULL;
@@ -141,6 +143,36 @@ Context::~Context()
 	}
 }
 
+int Context::getWidth(void)
+{
+	assert(this->width > 1 && "width is below 0");
+
+	return this->width;
+}
+
+int Context::getHeight(void)
+{
+	assert(this->width > 1 && "height is below 0");
+
+	return this->height;
+}
+
+void Context::setWidth(int _width)
+{
+	this->width = _width;
+}
+
+
+void Context::setHeight(int _height)
+{
+	this->height = _height;
+}
+
+
+int Context::getConvertingRange(void)
+{
+	return convertingRange;
+}
 
 Context *Context::context = NULL;
 

@@ -16,6 +16,15 @@ Frame2TextFrame::Frame2TextFrame()
 	pTextFrameQueue = pContext->getTextFrameQueue();	
 
 	pUnusedInputFrameStack = pContext->getUnusedInputFrameStack();
+
+	//create text frame
+	int limit = pContext->getFrameLimit();
+	for(int i = 0 ; i < limit ; i++)
+	{
+		TextFrame* pTextFrame;
+		pTextFrame = new TextFrame();
+		pUnusedTextFrameStack->push(pTextFrame);
+	}
 }
 
 Frame2TextFrame::~Frame2TextFrame()
@@ -25,8 +34,8 @@ Frame2TextFrame::~Frame2TextFrame()
 
 void Frame2TextFrame::main(void)
 {
-	int limit = pContext->getFrameLimit();
-	for(int i = 0 ; i < limit ; i++)
+	int range = pContext->getConvertingRange();
+	for(int i = 0 ; i < range ; i++)
 	{
 		convertFrame();
 	}
@@ -35,20 +44,33 @@ void Frame2TextFrame::main(void)
 
 void Frame2TextFrame::convertFrame(void)
 {
-	Frame *frame = NULL;
-	frame = pInputFrameQueue->pop();
-	convertFrame(frame);
-	pUnusedInputFrameStack->push(frame);
+	bool readComplete = false;
+	while(readComplete == false)
+	{
+		Frame *frame = NULL;
+		if(pInputFrameQueue->isEmpty() == false)
+		{
+			frame = pInputFrameQueue->pop();
+			convertFrame(frame);
+			pUnusedInputFrameStack->push(frame);
+			readComplete = true;
+		} 
+	}
 }
 
 void Frame2TextFrame::convertFrame(Frame* _pFrame)
 {
-
-	TextFrame* pTextFrame;
-	if(pUnusedTextFrameStack->isEmpty())
-		pTextFrame = new TextFrame();
-	else
-		pTextFrame = pUnusedTextFrameStack->pop();
+	//get unused text frame from stack
+	bool readComplete = false;
+	TextFrame *pTextFrame;
+	while(readComplete == false)
+	{
+		if(pUnusedTextFrameStack->isEmpty() == false)
+		{
+			pTextFrame = pUnusedTextFrameStack->pop();
+			readComplete = true;
+		}
+	}
 
 	aa_hardware_params hParams;	// hardware params for aalib
 	

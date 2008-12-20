@@ -9,6 +9,7 @@
 
 VideoIO::VideoIO()
 {
+	writingRequested = false;
 	frameIndex = 0;
 	inputFilename = NULL;
 	outputFilename = NULL;
@@ -50,6 +51,11 @@ VideoIO::VideoIO()
 	pContext->setVideoIO(this);
 }
 
+void VideoIO::requestToWrite(void)
+{
+	writingRequested = true;
+}
+
 VideoIO::~VideoIO()
 {
 	//close output video
@@ -60,7 +66,7 @@ VideoIO::~VideoIO()
 		{
 			fflush(stdout);
 			outSize = avcodec_encode_video(pOutputCodecCtx, pOutBuffer, outBufferSize, NULL);
-			printf("write frame %3d (size=%5d)\n", i, outSize);
+			printf("[VideoIO] write frame : %3d (size=%5d)\n", i, outSize);
 			fwrite(pOutBuffer, 1, outSize, pOutputFile);
 		}
 		
@@ -118,8 +124,16 @@ bool VideoIO::init(int argc, char *argv[])
 	if(openInputCodecReturn == false)
 		exit(EXIT_FAILURE);
 
+	//set video's height, width
+	int width = pInputCodecCtx->width;
+	int height = pInputCodecCtx->height;
+	pContext->setHeight(height);
+	pContext->setWidth(width);
+
 	//set output file name;
 	outputFilename = argv[2];
+	openOutputCodec(width, height);
+
 	//openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
 /*
 	for(int i = 0 ; i < frameLimit ; i++)
@@ -136,17 +150,27 @@ bool VideoIO::init(int argc, char *argv[])
 	return true;
 }
 
-int VideoIO::main(int argc, char *argv[])
+int VideoIO::main(void)
 {
-	init(argc, argv);
-	
-	int frameLimit = pContext->getFrameLimit();
-	for(int i = 0 ; i < frameLimit ; i++)
+	///TODO
+	int range = pContext->getConvertingRange();
+	int i = 0;
+	while(i < range)
 	{
-		readFrame();
-		Frame *frame = pInputFrameQueue->pop();
-		pOutputFrameHeap->push(frame);
-		writeFrame();
+		if(writingRequested == true)
+		{
+			//write frame
+			while(pOutputFrameHeap->isEmpty() == false)
+			{
+				writeFrame();
+			}
+		}
+		else
+		{
+			//read frame
+			readFrame();
+			i++;
+		}
 	}
 
 	return 0;
@@ -154,6 +178,7 @@ int VideoIO::main(int argc, char *argv[])
 
 bool VideoIO::writeFrame(void)
 {
+	/*
 	if(pOutputCodecCtx == NULL)
 	{
 		//open output codec
@@ -162,6 +187,7 @@ bool VideoIO::writeFrame(void)
 		int height = frame->getHeight();
 		openOutputCodec(width, height);
 	}
+	*/
 	int w = pOutputCodecCtx->width;
 	int h = pOutputCodecCtx->height;
 	
@@ -183,7 +209,7 @@ bool VideoIO::writeFrame(void)
 
 	//write frame
 	outSize = avcodec_encode_video(pOutputCodecCtx, pOutBuffer, outBufferSize, pOutputFrame);
-	printf("id#%d, size : %d\n", frame->getId(), outSize);
+	printf("[VideoIO] write Frame : id#%d, size : %d\n", frame->getId(), outSize);
 	fwrite(pOutBuffer, 1, outSize, pOutputFile);
 
 	//saveFrame(frame, w, h, frame->getId());
@@ -323,7 +349,7 @@ bool VideoIO::readFrame(void)
 					
 					frame->setId(frameIndex);
 					
-					fprintf(stderr, "read frame#%d\n", frame->getId());
+					fprintf(stderr, "[VideoIO] read frame : #%d\n", frame->getId());
 					
 					//complete read a frame, then push to queue
 					pInputFrameQueue->push(frame);

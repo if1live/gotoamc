@@ -29,13 +29,13 @@ public:
 	//dtor
 	~VideoIO();
 
-	int main(int argc, char *argv[]);	//thread's function
+	int main(void);	//thread's function
 	bool readFrame(void);	//read a frame from video then save to pFrame
 	bool writeFrame(void);	//write a frame
 	bool saveFrame(Frame *_pFrame);	
 	bool isReadingComplete(void);
 	bool init(int argc, char *argv[]);	//initialize codec
-
+	void requestToWrite(void);	//request to this class(videoIO) to write frame
 private:
 	//member function
 	int getFrameIndex(void);
@@ -85,5 +85,6 @@ private:
 	int outSize;
 
 	bool readComplete;
+	bool writingRequested;
 };
 

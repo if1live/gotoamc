@@ -1,4 +1,5 @@
 #include <cassert>
+#include "videoIO.h"
 #include "queue.h"
 #include "textFrame2PPM.h"
 #include "context.h"
@@ -6,6 +7,7 @@
 
 TextFrame2PPM::TextFrame2PPM()
 {
+	outputFrameCount = 0;
 	ratio = 4;	//resize factor	
 	textBuffer = NULL;
 	//open font ppm file : BEGIN
@@ -35,8 +37,6 @@ TextFrame2PPM::TextFrame2PPM()
 
 	//set pointer of this
 	pContext->setTextFrame2PPM(this);
-
-	isFirstRun = true;
 }
 
 void TextFrame2PPM::createEmptyFrame(void)
@@ -45,10 +45,10 @@ void TextFrame2PPM::createEmptyFrame(void)
 	printf("[TextFrame2PPM] create Empty Frame....");
 
 	//get a text frame to get text width, text height
-	TextFrame *textFrame = NULL;
+//	TextFrame *textFrame = NULL;
 	///TODO
 	
-	while(textFrame == NULL)
+/*	while(textFrame == NULL)
 	{
 		if(pTextFrameQueue->isEmpty() == false)
 		{
@@ -56,15 +56,13 @@ void TextFrame2PPM::createEmptyFrame(void)
 			break;
 		}
 	}
-
+*/
+	//create unused output frame
 	int frameLimit = pContext->getFrameLimit();
-	int width;
-	int height;
+	int width = pContext->getWidth() / 2 / ratio;
+	int height = pContext->getHeight() / 2 / ratio;
 	for(int i = 0 ; i < frameLimit ; i++)
 	{
-		width = textFrame->getTextWidth() / ratio;
-		height = textFrame->getTextHeight() / ratio;
-
 		//create frame
 		Frame *frame = new Frame();
 		frame->setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
@@ -81,8 +79,8 @@ void TextFrame2PPM::createEmptyFrame(void)
 int TextFrame2PPM::main(void)
 {
 	//entry point
-	int limit = pContext->getFrameLimit();
-	for(int i = 0 ; i < limit ; i++)
+	int range = pContext->getConvertingRange();
+	for(int i = 0 ; i < range ; i++)
 	{
 		convert();
 	}
@@ -91,16 +89,32 @@ int TextFrame2PPM::main(void)
 
 void TextFrame2PPM::convert()
 {
-	if(isFirstRun == true)
+/*	if(isFirstRun == true)
 	{
 		createEmptyFrame();
 		isFirstRun = false;
 	}
-
+*/
+	//request to write frame
+	int limit = pContext->getFrameLimit();
+	if(outputFrameCount == limit)
+	{
+		VideoIO *videoIO = pContext->getVideoIO();
+		videoIO->requestToWrite();
+		outputFrameCount = 0;
+	}
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
-	textFrame = pTextFrameQueue->pop();
+	bool getTextFrameComplete = false;
+	while(getTextFrameComplete == false)
+	{
+		if(pTextFrameQueue->isEmpty() == false)
+		{
+			textFrame = pTextFrameQueue->pop();
+			getTextFrameComplete = true;
+		}
+	}
 	//	pTextFrameQueue->pop();	//get text frame : success
 
 	//DEBUG
@@ -129,7 +143,15 @@ void TextFrame2PPM::convert()
 
 	//get unused frame
 	Frame *outputFrame = NULL;
-	outputFrame = pUnusedOutputFrameStack->pop();
+	bool getFrameComplete = false;
+	while(getFrameComplete == false)
+	{
+		if(pUnusedOutputFrameStack->isEmpty() == false)
+		{
+			outputFrame = pUnusedOutputFrameStack->pop();
+			getFrameComplete = true;
+		}
+	}
 	
 	//	Frame outputFrame;
 	//    outputFrame.setBlankFrame( WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height );
@@ -161,6 +183,7 @@ void TextFrame2PPM::convert()
 
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
+	outputFrameCount++;
 
 	//DEBUG
 	printf("complete\n");

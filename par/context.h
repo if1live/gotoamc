@@ -36,10 +36,15 @@ public:
 	void setFrame2TextFrame(Frame2TextFrame *_ptr);
 
 	int getFrameLimit(void);
+	int getConvertingRange(void);
+	int getWidth(void);
+	int getHeight(void);
+	void setWidth(int _width);
+	void setHeight(int _height);
 private:
 	//ctor
 	Context();
-
+	
 	static Context *context;
 
 	FrameHeap *pOutputFrameHeap;
@@ -54,5 +59,9 @@ private:
 	Frame2TextFrame *pFrame2TextFrame;
 
 	int frameLimit;
+	int convertingRange;
+
+	int width;
+	int height;
 };
 
