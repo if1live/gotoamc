@@ -60,7 +60,7 @@ bool Stack<T>::isEmpty()
 template <class T>
 bool Stack<T>::isFull()
 {
-	if ( m_top == capacity )
+	if ( m_top == capacity - 1 )
 		return true;
 	else
 		return false;
