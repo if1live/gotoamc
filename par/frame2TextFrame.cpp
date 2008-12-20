@@ -3,6 +3,7 @@
 
 Frame2TextFrame::Frame2TextFrame()
 {
+	endFlag = false;
 	//how many frame calculated? and required lock
 	index = 0;
 	pthread_mutex_init(&indexLock, NULL);
@@ -55,12 +56,15 @@ void Frame2TextFrame::main(void)
 		convertFrame();
 		incIndex();
 	}
+
+	endFlag = true;
+	fprintf(stderr, "[Frame2TextFrame] Exit <<<<<<<<<<<<<<<<<<\n");
 }
 
 void Frame2TextFrame::convertFrame(void)
 {
 	bool readComplete = false;
-	while(readComplete == false)
+	while(readComplete == false && endFlag == false)
 	{
 		Frame *frame = NULL;
 		//locked area - START

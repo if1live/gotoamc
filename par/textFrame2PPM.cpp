@@ -7,6 +7,7 @@
 
 TextFrame2PPM::TextFrame2PPM()
 {
+	endFlag = false;
 	index = 0;
 	pthread_mutex_init(&indexLock, NULL);
 	pthread_mutex_init(&lock1, NULL);
@@ -76,11 +77,13 @@ int TextFrame2PPM::main(void)
 	{
 		convert();
 		incIndex();
-//		fprintf(stderr, "[%d]end\n", index);
 	}
 	
 	VideoIO *videoIO = pContext->getVideoIO();
 	videoIO->requestToWrite(-1);
+
+	fprintf(stderr, "[TextFrame2PPM] Exit <<<<<<<<<<<<<<<\n");
+	endFlag = true;
 	return 0;
 }
 
@@ -108,6 +111,9 @@ void TextFrame2PPM::convert()
 		}
 		pthread_mutex_unlock(&lock1);
 		//locked area - end
+		//
+		if(endFlag == true)
+			return;
 	}
 	//	pTextFrameQueue->pop();	//get text frame : success
 

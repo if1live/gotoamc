@@ -36,28 +36,38 @@ int main(int argc, char *argv[])
 	//create thread
 	//first thread is videoIO's thread
 	//this program needs more than 3 thread.
+	printf("Thread Create : videoIO [ %d ]\n", 0);
 	pthread_create(&thrs[0], NULL, videoIOThr, (void *)videoIO);
 
 	//other thread
 	for(int i = 1 ; i < threadNum ; i++)
 	{
 		if(i % 2 == 1)
+		{
+			printf("Thread Create : frame2TextFrame [ %d ]\n", i);
 			pthread_create(&thrs[i], NULL, frame2TextFrameThr, (void *)frame2TextFrame);
+		}
 		else
+		{
+			printf("Thread Create : textFrame2PPM [ %d ]\n", i);
 			pthread_create(&thrs[i], NULL, textFrame2PPMThr, (void *)textFrame2PPM);
+		}
 	}
 
 	//join thread
 	//step1. join frame2textFrame
-	for(int i = 1 ; i < threadNum ; i = i+2)
-		pthread_join(thrs[i], NULL);
+	fprintf(stderr, "thread num : %d\n", threadNum);
+//	for(int i = 1 ; i < threadNum ; i = i+2)
+//		pthread_join(thrs[i], NULL);
 	//step2. join textFram2PPM
-	for(int i = 2 ; i < threadNum ; i = i+2)
+//	for(int i = 2 ; i < threadNum ; i = i+2)
+//		pthread_join(thrs[i], NULL);
+	for(int i = 0 ; i < threadNum ; i++)
 		pthread_join(thrs[i], NULL);
 	//step3. joint videoIO
-	fprintf(stderr, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-	pthread_join(thrs[0], NULL);
-	fprintf(stderr, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+//	fprintf(stderr, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+//	pthread_join(thrs[0], NULL);
+//	fprintf(stderr, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 	delete context;	//delete context data
 

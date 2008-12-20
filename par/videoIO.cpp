@@ -194,6 +194,7 @@ int VideoIO::main(void)
 	while(pOutputFrameHeap->isEmpty() == false)
 		writeFrame();
 
+	fprintf(stderr, "[VideoIO] Exit <<<<<<<<<<<<<<<<<<\n");
 	return 0;
 }
 

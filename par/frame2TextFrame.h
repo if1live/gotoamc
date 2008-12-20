@@ -34,5 +34,7 @@ private:
 	pthread_mutex_t lock1;
 	pthread_mutex_t indexLock;
 	pthread_mutex_t lock2;
+
+	bool endFlag;
 };
 
