@@ -10,7 +10,7 @@ FrameHeap::FrameHeap(int _capacity)
 	capacity = _capacity + 1;
 	heapSize = 0;
 	ppHeap = new Frame* [capacity + 1];
-	mutex = PTHREAD_MUTEX_INITIALIZER;
+	pthread_mutex_init(&mutex, NULL);
 }
 
 FrameHeap::~FrameHeap()
@@ -20,6 +20,7 @@ FrameHeap::~FrameHeap()
 		delete[] ppHeap;
 		ppHeap = NULL;
 	}
+	pthread_mutex_destroy(&mutex);
 }
 
 bool FrameHeap::isEmpty(void)

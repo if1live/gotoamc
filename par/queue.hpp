@@ -1,6 +1,4 @@
 #include <string.h>	// for memcpy
-#include <pthread.h>
-#include "queue.h"
 
 template <class T>
 Queue<T>::Queue(int _capacity)
@@ -11,8 +9,7 @@ Queue<T>::Queue(int _capacity)
 	capacity = _capacity;
 	mFront = mRear = 0;
 	pQueue = new T[capacity];
-	mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-	pthread_mutex_init( mutex, NULL );
+	pthread_mutex_init( &mutex, NULL );
 }
 
 template <class T>
@@ -23,16 +20,15 @@ Queue<T>::~Queue<T>()
 		delete[] pQueue;
 		pQueue = NULL;
 	}
-	pthread_mutex_destroy( mutex );
-	free( mutex );
+	pthread_mutex_destroy( &mutex );
 }
 
 template <class T>
 bool Queue<T>::isEmpty(void)
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	bool ret = (mFront == mRear);
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
 		
 	return ret;
 }
@@ -41,9 +37,9 @@ bool Queue<T>::isEmpty(void)
 template <class T>
 bool Queue<T>::isFull(void)
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	bool ret = (((mRear+1) % capacity) == mFront);
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
 	
 	return ret;
 }
@@ -52,13 +48,13 @@ bool Queue<T>::isFull(void)
 template <class T>
 T &Queue<T>::front(void)
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	bool ret = (mFront == mRear);
 	
 	if(ret) throw "Queue is empty: No front element";
 
 	T& temp = pQueue[(mFront+1) % capacity];
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
    
 	return temp;
 }
@@ -66,13 +62,13 @@ T &Queue<T>::front(void)
 template <class T>
 T &Queue<T>::rear(void)
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	bool ret = (((mRear+1) % capacity) == mFront);
 	
 	if(ret) throw "Queue is empty: No rear element";
 
 	T& temp = pQueue[mRear];
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
    
 	return temp;;
 }
@@ -81,7 +77,7 @@ T &Queue<T>::rear(void)
 template <class T>
 void Queue<T>::push(T &_item)
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	if( ((mRear+1) % capacity) == mFront )	// full? then double the capacity
 	{
 		// DS textbook p.146
@@ -113,19 +109,19 @@ void Queue<T>::push(T &_item)
 
 	mRear = (mRear+1) % capacity;
 	pQueue[mRear] = _item;
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
 }
 
 
 template <class T>
 T Queue<T>::pop()
 {
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	if( mFront == mRear ) throw "Queue is empty";
 
 	mFront = (mFront + 1)%capacity;
 	T temp = pQueue[mFront];
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
 	return temp;
 }
 

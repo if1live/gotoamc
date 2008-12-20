@@ -18,7 +18,7 @@ private:
 	T* pArray;
 	int capacity;
 	int m_top;
-	ptread_mutex_t mutex;
+	pthread_mutex_t mutex;
 };
 
 #include "stack.hpp"

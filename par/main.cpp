@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 		}
 		catch(const char *msg)
 		{
-			fprintf(stderr, "Except : %s\n");
+			fprintf(stderr, "Except : %s\n", msg);
 			delete context;
 			return 1;
 		}

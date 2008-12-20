@@ -23,6 +23,7 @@ private:
 	int capacity;
 	int mFront;
 	int mRear;
-	pthread_mutex_t* mutex;
+	pthread_mutex_t mutex;
 };
 
+#include "queue.hpp"

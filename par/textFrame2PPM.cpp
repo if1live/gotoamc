@@ -1,5 +1,5 @@
 #include <cassert>
-#include "queue.hpp"
+#include "queue.h"
 #include "textFrame2PPM.h"
 #include "context.h"
 #include "frameHeap.h"

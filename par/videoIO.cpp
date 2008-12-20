@@ -4,7 +4,7 @@
 #include "frame.h"
 #include "frameHeap.h"
 #include "context.h"
-#include "queue.hpp"
+#include "queue.h"
 #include "stack.h"
 
 VideoIO::VideoIO()
@@ -121,7 +121,7 @@ bool VideoIO::init(int argc, char *argv[])
 	//set output file name;
 	outputFilename = argv[2];
 	//openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
-
+/*
 	for(int i = 0 ; i < frameLimit ; i++)
 	{
 		//assign appropriate parts of buffer to image planes in pFrameRGB
@@ -130,6 +130,7 @@ bool VideoIO::init(int argc, char *argv[])
 		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 		pUnusedInputFrameStack->push(pInputFrame);
 	}
+*/
 	fprintf(stderr, "[video IO] codec initialize \n");
 
 	return true;
@@ -170,6 +171,7 @@ bool VideoIO::writeFrame(void)
 	{
 		if(pOutputFrameHeap->isEmpty() == false)
 		{
+			///TODO
 			frame = pOutputFrameHeap->top();
 			pOutputFrameHeap->pop();
 			break;	//get output frame : success
@@ -288,6 +290,16 @@ bool VideoIO::readFrame(void)
 	//else...continue read frame from video
 	bool readSuccess = false;
 	
+	Frame *pInputFrame = NULL;
+	if(pUnusedInputFrameStack->isEmpty() == true)
+	{
+		pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
+	}
+	else
+	{
+		pInputFrame = pUnusedInputFrameStack->pop();
+	}
+
 	while(readSuccess != true && readComplete == false)
 	{
 		if(av_read_frame(pFormatCtx, &packet) >= 0)
@@ -296,7 +308,7 @@ bool VideoIO::readFrame(void)
 			if(packet.stream_index == videoStream)
 			{
 				//decode video frame
-				avcodec_decode_video(pInputCodecCtx, pInputFrame, &frameFinished,
+				avcodec_decode_video(pInputCodecCtx, pInputFrame->getFrame(), &frameFinished,
 									 packet.data, packet.size);
 				
 				//did we get a frame?

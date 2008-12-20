@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string.h>
-#include "stack.h"
 
 
 template <class T>
@@ -9,13 +8,14 @@ Stack<T>::Stack( int _capacity )
 	capacity = _capacity;
 	m_top = -1;
 	pArray = new T[capacity];
-	mutex = PTHEAD_MUTEX_INITIALIZER;
+	pthread_mutex_init(&mutex, NULL);
 }
 
 template <class T>
 Stack<T>::~Stack(void)
 {
 	delete[] pArray;
+	pthread_mutex_destroy(&mutex);
 }
 
 
