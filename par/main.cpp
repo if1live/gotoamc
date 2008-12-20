@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
 	//initialize ffmpeg codec
 	videoIO->init(argc, argv);
 
+	//create empty frame
+	textFrame2PPM->createEmptyFrame();
+
 	//create thread
 	//first thread is videoIO's thread
 	//this program needs more than 3 thread.
@@ -52,7 +55,9 @@ int main(int argc, char *argv[])
 	for(int i = 2 ; i < threadNum ; i = i+2)
 		pthread_join(thrs[i], NULL);
 	//step3. joint videoIO
+	fprintf(stderr, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 	pthread_join(thrs[0], NULL);
+	fprintf(stderr, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 	delete context;	//delete context data
 
@@ -86,8 +91,6 @@ void *textFrame2PPMThr(void *arg)
 {
 	try {
 		TextFrame2PPM *textFrame2PPM = (TextFrame2PPM *) arg;
-		//create empty frame
-		textFrame2PPM->createEmptyFrame();
 		//start main!
 		textFrame2PPM->main();
 	} catch(const char *msg) {

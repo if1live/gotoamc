@@ -86,5 +86,6 @@ private:
 
 	bool readComplete;
 	int writingRequested;
+	bool writeAllFrame;	//convert complete, write remain frame
 };
 

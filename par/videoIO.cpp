@@ -49,11 +49,19 @@ VideoIO::VideoIO()
 
 	//set pointer of this
 	pContext->setVideoIO(this);
+	writeAllFrame = false;
 }
 
 void VideoIO::requestToWrite(int count)
 {
-	writingRequested = count;
+	//if -1, write all frame from frame heap
+	if(-1 == count)
+	{
+		writeAllFrame = true;
+		fprintf(stderr, "------------writeAllFrame = true----------------------");
+	}
+	else
+		writingRequested = count;
 }
 
 VideoIO::~VideoIO()
@@ -131,17 +139,6 @@ bool VideoIO::init(int argc, char *argv[])
 	outputFilename = argv[2];
 	openOutputCodec(width, height);
 
-	//openOutputCodec(outputFilename, pInputCodecCtx->width, pInputCodecCtx->height);
-/*
-	for(int i = 0 ; i < frameLimit ; i++)
-	{
-		//assign appropriate parts of buffer to image planes in pFrameRGB
-		//note that pFrameRGB is an AVFrame, bug AVFrame is a superset of AVPicture
-		//type : RGB24
-		Frame *pInputFrame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
-		pUnusedInputFrameStack->push(pInputFrame);
-	}
-*/
 	fprintf(stderr, "[video IO] codec initialize \n");
 
 	return true;
@@ -154,14 +151,22 @@ int VideoIO::main(void)
 	int i = 0;
 	while(i < range)
 	{
-		if(writingRequested != 0)
+		if(writingRequested != 0 || writeAllFrame == true)
 		{
 			//write frame
-			for(int i = 0 ; i < writingRequested ; i++)
+			if(writingRequested != 0)
 			{
-				writeFrame();
+				for(int i = 0 ; i < writingRequested ; i++)
+				{
+					writeFrame();
+				}
+				writingRequested = 0;
 			}
-			writingRequested = 0;
+			else
+			{
+				while(pOutputFrameHeap->isEmpty() == false)
+					writeFrame();
+			}
 		}
 		else
 		{
@@ -170,6 +175,15 @@ int VideoIO::main(void)
 			i++;
 		}
 	}
+	//waiting to textFram2PPM exit
+//	while(writeAllFrame == false)
+//	{
+//		;	//waiting
+//	}
+	
+	//write remain frame
+	while(pOutputFrameHeap->isEmpty() == false)
+		writeFrame();
 
 	return 0;
 }

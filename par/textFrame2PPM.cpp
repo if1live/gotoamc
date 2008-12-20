@@ -74,7 +74,11 @@ int TextFrame2PPM::main(void)
 	{
 		convert();
 		incIndex();
+//		fprintf(stderr, "[%d]end\n", index);
 	}
+	
+	VideoIO *videoIO = pContext->getVideoIO();
+	videoIO->requestToWrite(-1);
 	return 0;
 }
 
