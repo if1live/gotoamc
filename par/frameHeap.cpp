@@ -10,6 +10,7 @@ FrameHeap::FrameHeap(int _capacity)
 	capacity = _capacity + 1;
 	heapSize = 0;
 	ppHeap = new Frame* [capacity + 1];
+	mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 FrameHeap::~FrameHeap()
@@ -23,31 +24,50 @@ FrameHeap::~FrameHeap()
 
 bool FrameHeap::isEmpty(void)
 {
+    pthread_mutex_lock( &mutex );
 	if(heapSize == 0)
-		return true;
+	{
+		pthread_mutex_unlock( &mutex );
+   		return true;
+	}
 	else
+	{
+		pthread_mutex_unlock( &mutex );
 		return false;
+	}
 }
 
 
 bool FrameHeap::isFull(void)
 {
+	pthread_mutex_lock( &mutex );
 	if(heapSize == capacity - 1)
+	{
+		pthread_mutex_unlock( &mutex );
 		return true;
+	}
 	else
+	{
+		pthread_mutex_unlock( &mutex );
 		return false;
+	}
 }
 
 
 Frame* FrameHeap::top(void)
 {
-	return ppHeap[1];
+	pthread_mutex_lock( &mutex );
+	Frame* temp = ppHeap[1];
+	pthread_mutex_unlock( &mutex );
+	
+	return temp;
 }
 
 void FrameHeap::push(Frame *_pFrame)
 {
+	pthread_mutex_lock( &mutex );
 	//insert _frame into min heap
-	if(isFull() == true)
+	if ( heapSize == capacity - 1 )
 	{
 		//double the capacity
 		Frame **tmp = new Frame* [capacity*2 + 1];
@@ -67,15 +87,17 @@ void FrameHeap::push(Frame *_pFrame)
 		currentNode = currentNode / 2;
 	}
 	ppHeap[currentNode] = _pFrame;
+	pthread_mutex_unlock( &mutex );
 }
 
 Frame *FrameHeap::pop(void)
 {
+	pthread_mutex_lock( &mutex );
 	//save return value
 	Frame *returnValue = ppHeap[1];
-
+	
 	//delete min element
-	if(isEmpty() == true)
+	if ( heapSize == 0 )
 		throw "heap is empty";
 
 	//remove last element from heap
@@ -105,6 +127,7 @@ Frame *FrameHeap::pop(void)
 		child = child * 2;
 	}
 	ppHeap[currentNode] = lastE;
+	pthread_mutex_unlock( &mutex );
 
 	return returnValue;
 }

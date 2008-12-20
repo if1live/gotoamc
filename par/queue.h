@@ -1,4 +1,5 @@
 #pragma once
+#include <pthread.h>
 
 template <class T>
 class Queue
@@ -22,6 +23,6 @@ private:
 	int capacity;
 	int mFront;
 	int mRear;
+	pthread_mutex_t* mutex;
 };
 
-#include "queue.hpp"

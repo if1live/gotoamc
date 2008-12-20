@@ -4,7 +4,7 @@
 #include "frame.h"
 #include "frameHeap.h"
 #include "context.h"
-#include "queue.h"
+#include "queue.hpp"
 #include "stack.h"
 
 VideoIO::VideoIO()

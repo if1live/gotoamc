@@ -1,4 +1,5 @@
 #pragma once
+#include <pthread.h>
 
 template <class T>
 class Stack
@@ -17,6 +18,7 @@ private:
 	T* pArray;
 	int capacity;
 	int m_top;
+	ptread_mutex_t mutex;
 };
 
 #include "stack.hpp"

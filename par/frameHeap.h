@@ -1,4 +1,5 @@
 #pragma once
+#include <pthread.h>
 
 class Frame;
 
@@ -21,5 +22,5 @@ private:
 	Frame **ppHeap;
 	int capacity;
 	int heapSize;
+	pthread_mutex_t mutex;
 };
-

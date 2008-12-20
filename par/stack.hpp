@@ -9,6 +9,7 @@ Stack<T>::Stack( int _capacity )
 	capacity = _capacity;
 	m_top = -1;
 	pArray = new T[capacity];
+	mutex = PTHEAD_MUTEX_INITIALIZER;
 }
 
 template <class T>
@@ -21,7 +22,8 @@ Stack<T>::~Stack(void)
 template <class T>
 void Stack<T>::push(T &_item )
 {
-	if ( isFull() == true )
+	pthread_mutex_lock( &mutex );
+	if ( m_top == capacity )
 	{
 		T* newArray = new T[capacity * 2];
 
@@ -35,40 +37,61 @@ void Stack<T>::push(T &_item )
 	}
 
 	pArray[++m_top] = _item;
+	pthread_mutex_unlock( &mutex );
 }
 
 template <class T>
 T Stack<T>::pop()
 {
-	if ( isEmpty() == true )
+	pthread_mutex_lock( &mutex );
+	if ( m_top == -1 )
 		throw "stack pop error: stack is empty";
 	
-	return pArray[m_top--];
+	T temp = pArray[m_top--];
+	pthread_mutex_unlock( &mutex );
+	return temp;
 }
 
 
 template <class T>
 bool Stack<T>::isEmpty()
 {
+	pthread_mutex_lock( &mutex );
 	if ( m_top == -1 )
+	{
+		pthread_mutex_unlock( &mutex );
 		return true;
+	}
 	else
+	{
+		pthread_mutex_unlock( &mutex );
 		return false;
+	}
 }
 
 
 template <class T>
 bool Stack<T>::isFull()
 {
+	pthread_mutex_lock( &mutex );
 	if ( m_top == capacity )
+	{
+		pthread_mutex_unlock( &mutex );
 		return true;
+	}
 	else
+	{
+		pthread_mutex_unlock( &mutex );
 		return false;
+	}
 }
 
 
 template <class T>
 T &Stack<T>::top()
 {
-	return pArray[m_top];
+	pthread_mutex_lock( &mutex );
+	T& temp = pArray[m_top];
+	pthread_mutex_unlock( &mutex );
+	return temp;
 }
