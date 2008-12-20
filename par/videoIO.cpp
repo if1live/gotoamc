@@ -58,7 +58,6 @@ void VideoIO::requestToWrite(int count)
 	if(-1 == count)
 	{
 		writeAllFrame = true;
-		fprintf(stderr, "------------writeAllFrame = true----------------------");
 	}
 	else
 		writingRequested = count;
@@ -138,6 +137,16 @@ bool VideoIO::init(int argc, char *argv[])
 	//set output file name;
 	outputFilename = argv[2];
 	openOutputCodec(width, height);
+
+	//create empty frame
+	Frame *frame = NULL;
+	int limit = pContext->getFrameLimit();
+	for(int i = 0 ; i < limit ; i++)
+	{
+		Frame *frame;
+		frame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
+		pUnusedInputFrameStack->push(frame);
+	}
 
 	fprintf(stderr, "[video IO] codec initialize \n");
 
@@ -323,13 +332,12 @@ bool VideoIO::readFrame(void)
 					int h = pInputCodecCtx->height;
 					
 					Frame *frame = NULL;
-					if(pUnusedInputFrameStack->isEmpty() == true)	///TODO
+					while(frame == NULL)
 					{
-						frame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
-					}
-					else
-					{
-						frame = pUnusedInputFrameStack->pop();
+						if(pUnusedInputFrameStack->isEmpty() == false)
+						{
+							frame = pUnusedInputFrameStack->pop();
+						}
 					}
 
 					//convert YUV420P->RGB24

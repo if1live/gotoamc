@@ -9,6 +9,8 @@ TextFrame2PPM::TextFrame2PPM()
 {
 	index = 0;
 	pthread_mutex_init(&indexLock, NULL);
+	pthread_mutex_init(&lock1, NULL);
+	pthread_mutex_init(&lock2, NULL);
 
 	outputFrameCount = 0;
 	ratio = 4;	//resize factor	
@@ -95,14 +97,17 @@ void TextFrame2PPM::convert()
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
-	bool getTextFrameComplete = false;
-	while(getTextFrameComplete == false)
+	while(textFrame == NULL)
 	{
+		//fprintf(stderr, "%d ", outputFrameCount);
+		//locked area - start
+		pthread_mutex_lock(&lock1);
 		if(pTextFrameQueue->isEmpty() == false)
 		{
 			textFrame = pTextFrameQueue->pop();
-			getTextFrameComplete = true;
 		}
+		pthread_mutex_unlock(&lock1);
+		//locked area - end
 	}
 	//	pTextFrameQueue->pop();	//get text frame : success
 
@@ -131,14 +136,16 @@ void TextFrame2PPM::convert()
 
 	//get unused frame
 	Frame *outputFrame = NULL;
-	bool getFrameComplete = false;
-	while(getFrameComplete == false)
+	while(outputFrame == NULL)
 	{
-		if(pUnusedOutputFrameStack->isEmpty() == false)	///TODO
+		//locked area - start
+		pthread_mutex_lock(&lock2);
+		if(pUnusedOutputFrameStack->isEmpty() == false)
 		{
 			outputFrame = pUnusedOutputFrameStack->pop();
-			getFrameComplete = true;
 		}
+		pthread_mutex_unlock(&lock2);
+		//locked area - end
 	}
 	
 	//	Frame outputFrame;
@@ -184,7 +191,11 @@ TextFrame2PPM::~TextFrame2PPM()
 		delete fonts[i];
 
 	delete textBuffer;
+
+	//delete mutex
 	pthread_mutex_destroy(&indexLock);
+	pthread_mutex_destroy(&lock1);
+	pthread_mutex_destroy(&lock2);
 }
 
 void TextFrame2PPM::incIndex(void)

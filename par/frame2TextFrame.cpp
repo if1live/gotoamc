@@ -6,6 +6,8 @@ Frame2TextFrame::Frame2TextFrame()
 	//how many frame calculated? and required lock
 	index = 0;
 	pthread_mutex_init(&indexLock, NULL);
+	pthread_mutex_init(&lock1, NULL);
+	pthread_mutex_init(&lock2, NULL);
 
 	// get context
 	pContext = Context::instance();
@@ -40,7 +42,9 @@ void Frame2TextFrame::incIndex(void)
 
 Frame2TextFrame::~Frame2TextFrame()
 {
-	pthread_mutex_destroy(&indexLock);	
+	pthread_mutex_destroy(&lock1);
+	pthread_mutex_destroy(&lock2);
+	pthread_mutex_destroy(&indexLock);
 }
 
 void Frame2TextFrame::main(void)
@@ -59,28 +63,40 @@ void Frame2TextFrame::convertFrame(void)
 	while(readComplete == false)
 	{
 		Frame *frame = NULL;
+		//locked area - START
+		pthread_mutex_lock(&lock1);
 		if(pInputFrameQueue->isEmpty() == false)
 		{
 			frame = pInputFrameQueue->pop();
+		}
+		pthread_mutex_unlock(&lock1);
+		//locked area - END
+		
+		if(frame != NULL)
+		{
 			convertFrame(frame);
 			pUnusedInputFrameStack->push(frame);
 			readComplete = true;
-		} 
+		}
 	}
 }
 
 void Frame2TextFrame::convertFrame(Frame* _pFrame)
 {
 	//get unused text frame from stack
-	bool readComplete = false;
-	TextFrame *pTextFrame;
-	while(readComplete == false)
+	TextFrame *pTextFrame = NULL;
+	while(pTextFrame == NULL)
 	{
+		//locked area - start
+		pthread_mutex_lock(&lock2);
+		
 		if(pUnusedTextFrameStack->isEmpty() == false)
 		{
 			pTextFrame = pUnusedTextFrameStack->pop();
-			readComplete = true;
 		}
+
+		pthread_mutex_unlock(&lock2);
+		//locked area - end
 	}
 
 	///DEBUG

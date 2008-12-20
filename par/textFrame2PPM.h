@@ -47,4 +47,6 @@ private :
 
 	int index;	//how many frame to write?
 	pthread_mutex_t indexLock;
+	pthread_mutex_t lock1;
+	pthread_mutex_t lock2;
 };
