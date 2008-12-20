@@ -23,7 +23,7 @@ template <class T>
 void Stack<T>::push(T &_item )
 {
 	pthread_mutex_lock( &mutex );
-	if ( m_top == capacity )
+	if ( m_top == capacity - 1 )
 	{
 		T* newArray = new T[capacity * 2];
 
