@@ -3,6 +3,10 @@
 
 Frame2TextFrame::Frame2TextFrame()
 {
+	//how many frame calculated? and required lock
+	index = 0;
+	pthread_mutex_init(&indexLock, NULL);
+
 	// get context
 	pContext = Context::instance();
 	
@@ -27,19 +31,26 @@ Frame2TextFrame::Frame2TextFrame()
 	}
 }
 
+void Frame2TextFrame::incIndex(void)
+{
+	pthread_mutex_lock(&indexLock);
+	index++;
+	pthread_mutex_unlock(&indexLock);
+}
+
 Frame2TextFrame::~Frame2TextFrame()
 {
-	
+	pthread_mutex_destroy(&indexLock);	
 }
 
 void Frame2TextFrame::main(void)
 {
 	int range = pContext->getConvertingRange();
-	for(int i = 0 ; i < range ; i++)
+	while(index < range)
 	{
 		convertFrame();
+		incIndex();
 	}
-	// TODO: run this with threads
 }
 
 void Frame2TextFrame::convertFrame(void)

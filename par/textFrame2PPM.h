@@ -1,3 +1,7 @@
+#pragma once
+
+#include <pthread.h>
+
 #include "frame.h"
 #include "textFrame.h"
 
@@ -38,4 +42,9 @@ private :
 
 	unsigned char *textBuffer;
 	int outputFrameCount;	//how many image exist in outputFrameHeap?
+
+	void incIndex(void);	//index++
+
+	int index;	//how many frame to write?
+	pthread_mutex_t indexLock;
 };

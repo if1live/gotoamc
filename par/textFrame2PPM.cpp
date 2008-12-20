@@ -7,6 +7,9 @@
 
 TextFrame2PPM::TextFrame2PPM()
 {
+	index = 0;
+	pthread_mutex_init(&indexLock, NULL);
+
 	outputFrameCount = 0;
 	ratio = 4;	//resize factor	
 	textBuffer = NULL;
@@ -67,21 +70,16 @@ int TextFrame2PPM::main(void)
 {
 	//entry point
 	int range = pContext->getConvertingRange();
-	for(int i = 0 ; i < range ; i++)
+	while(index < range)
 	{
 		convert();
+		incIndex();
 	}
 	return 0;
 }
 
 void TextFrame2PPM::convert()
 {
-/*	if(isFirstRun == true)
-	{
-		createEmptyFrame();
-		isFirstRun = false;
-	}
-*/
 	//request to write frame
 	int limit = pContext->getFrameLimit();
 	if(outputFrameCount >= limit)
@@ -182,6 +180,14 @@ TextFrame2PPM::~TextFrame2PPM()
 		delete fonts[i];
 
 	delete textBuffer;
+	pthread_mutex_destroy(&indexLock);
+}
+
+void TextFrame2PPM::incIndex(void)
+{
+	pthread_mutex_lock(&indexLock);
+	index++;
+	pthread_mutex_unlock(&indexLock);
 }
 
 

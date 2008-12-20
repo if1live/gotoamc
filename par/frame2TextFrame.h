@@ -1,9 +1,12 @@
 #pragma once
+
+#include <pthread.h>
 #include "frame.h"
 #include "context.h"
 #include "queue.h"
 #include "stack.h"
 #include "textFrame.h"
+
 #define RMASK 0xff0000
 #define GMASK 0x00ff00
 #define BMASK 0x0000ff
@@ -23,5 +26,11 @@ private:
 	Stack<Frame *>* pUnusedInputFrameStack;
 	Stack<TextFrame *>* pUnusedTextFrameStack;
 	Queue<TextFrame *>* pTextFrameQueue;
+
+	void incIndex(void);
+
+	int index;	//how many frame calculated
+
+	pthread_mutex_t indexLock;
 };
 

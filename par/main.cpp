@@ -10,11 +10,17 @@
 void *videoIOThr(void *arg);
 void *frame2TextFrameThr(void *arg);
 void *textFrame2PPMThr(void *arg);
+bool validateArg(int argc, char *argv[]);
 
-pthread_t thrs[3];
+pthread_t thrs[16];	//maxminal thread
+int threadNum;	//how many thread to use?
 
 int main(int argc, char *argv[])
 {
+	//validating argument
+	if(validateArg(argc, argv) == false)
+		exit(EXIT_FAILURE);
+
 	Context *context = Context::instance();	//create global data
 
 	VideoIO *videoIO = new VideoIO();
@@ -25,34 +31,29 @@ int main(int argc, char *argv[])
 	videoIO->init(argc, argv);
 
 	//create thread
+	//first thread is videoIO's thread
+	//this program needs more than 3 thread.
 	pthread_create(&thrs[0], NULL, videoIOThr, (void *)videoIO);
-//	sleep(5);
-	pthread_create(&thrs[1], NULL, frame2TextFrameThr, (void *)frame2TextFrame);
-//	sleep(5);
-	pthread_create(&thrs[2], NULL, textFrame2PPMThr, (void *)textFrame2PPM);
+
+	//other thread
+	for(int i = 1 ; i < threadNum ; i++)
+	{
+		if(i % 2 == 1)
+			pthread_create(&thrs[i], NULL, frame2TextFrameThr, (void *)frame2TextFrame);
+		else
+			pthread_create(&thrs[i], NULL, textFrame2PPMThr, (void *)textFrame2PPM);
+	}
 
 	//join thread
-	for(int i = 2 ; i >= 0 ; i--)
+	//step1. join frame2textFrame
+	for(int i = 1 ; i < threadNum ; i = i+2)
 		pthread_join(thrs[i], NULL);
+	//step2. join textFram2PPM
+	for(int i = 2 ; i < threadNum ; i = i+2)
+		pthread_join(thrs[i], NULL);
+	//step3. joint videoIO
+	pthread_join(thrs[0], NULL);
 
-
-	//	while(videoIO->isReadingComplete() == false)
-	//	for(int i = 0 ; i < 30 ; i++)
-	//	{
-	//		try
-	//		{
-	//			videoIO->readFrame();
-	//			frame2TextFrame->convertFrame();
-	//			textFrame2PPM->convert();
-	//			videoIO->writeFrame();
-	//		}
-	//		catch(const char *msg)
-	//		{
-	//			fprintf(stderr, "Except : %s\n", msg);
-	//			delete context;
-	//			return 1;
-	//		}
-	//	}
 	delete context;	//delete context data
 
 	return 0;
@@ -96,3 +97,22 @@ void *textFrame2PPMThr(void *arg)
 }
 
 
+bool validateArg(int argc, char *argv[])
+{
+	//validation commandline argument
+	if(argc != 4)
+	{
+		printf("Usage : %s <input video> <output video> <thread num, 3~16>\n", argv[0]);
+		return false;
+	}
+	
+	//else
+	threadNum = atoi(argv[3]);
+
+	if(threadNum < 3 || threadNum > 16)
+	{
+		printf("Error : not valid thread number, %d\n", threadNum);
+		return false;
+	}
+	return true;
+}

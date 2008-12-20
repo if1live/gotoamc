@@ -115,9 +115,6 @@ bool VideoIO::init(int argc, char *argv[])
 {
 	int frameLimit = pContext->getFrameLimit();
 	
-	if(validateArg(argc, argv) == false)
-		exit(EXIT_FAILURE);	//quit program
-
 	//open input codec & video
 	inputFilename = argv[1];
 	bool openInputCodecReturn = openInputCodec();
@@ -179,16 +176,6 @@ int VideoIO::main(void)
 
 bool VideoIO::writeFrame(void)
 {
-	/*
-	if(pOutputCodecCtx == NULL)
-	{
-		//open output codec
-		Frame *frame = pOutputFrameHeap->top();
-		int width = frame->getWidth();
-		int height = frame->getHeight();
-		openOutputCodec(width, height);
-	}
-	*/
 	int w = pOutputCodecCtx->width;
 	int h = pOutputCodecCtx->height;
 	
@@ -229,19 +216,6 @@ void VideoIO::incFrameIndex(void)
 {
 	frameIndex++;
 }
-
-bool VideoIO::validateArg(int argc, char *argv[])
-{
-	//validating commandline argument
-	if(argc != 3)
-	{
-		printf("Usage : %s <input video> <output video>\n", argv[0]);
-		return false;
-	}
-	//else
-	return true;	
-}
-
 
 //return value
 //true : success
