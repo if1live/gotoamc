@@ -9,7 +9,7 @@
 
 VideoIO::VideoIO()
 {
-	writingRequested = false;
+	writingRequested = 0;
 	frameIndex = 0;
 	inputFilename = NULL;
 	outputFilename = NULL;
@@ -51,9 +51,9 @@ VideoIO::VideoIO()
 	pContext->setVideoIO(this);
 }
 
-void VideoIO::requestToWrite(void)
+void VideoIO::requestToWrite(int count)
 {
-	writingRequested = true;
+	writingRequested = count;
 }
 
 VideoIO::~VideoIO()
@@ -157,13 +157,14 @@ int VideoIO::main(void)
 	int i = 0;
 	while(i < range)
 	{
-		if(writingRequested == true)
+		if(writingRequested != 0)
 		{
 			//write frame
-			while(pOutputFrameHeap->isEmpty() == false)
+			for(int i = 0 ; i < writingRequested ; i++)
 			{
 				writeFrame();
 			}
+			writingRequested = 0;
 		}
 		else
 		{

@@ -35,7 +35,7 @@ public:
 	bool saveFrame(Frame *_pFrame);	
 	bool isReadingComplete(void);
 	bool init(int argc, char *argv[]);	//initialize codec
-	void requestToWrite(void);	//request to this class(videoIO) to write frame
+	void requestToWrite(int count);	//request to this class(videoIO) to write frame
 private:
 	//member function
 	int getFrameIndex(void);
@@ -85,6 +85,6 @@ private:
 	int outSize;
 
 	bool readComplete;
-	bool writingRequested;
+	int writingRequested;
 };
 

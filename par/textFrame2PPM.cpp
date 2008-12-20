@@ -100,7 +100,7 @@ void TextFrame2PPM::convert()
 	if(outputFrameCount == limit)
 	{
 		VideoIO *videoIO = pContext->getVideoIO();
-		videoIO->requestToWrite();
+		videoIO->requestToWrite(outputFrameCount);
 		outputFrameCount = 0;
 	}
 
