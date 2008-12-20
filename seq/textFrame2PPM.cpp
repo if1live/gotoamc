@@ -15,7 +15,7 @@ TextFrame2PPM::TextFrame2PPM()
 	{
 		fonts[i] = new Frame();	//frame of font image
 		
-		snprintf(buffer, 31, "res/%d.ppm", i);
+		snprintf(buffer, 31, "../res/%d.ppm", i);
 		fonts[i]->openPPM(buffer);
 	}
 	delete[] buffer;
@@ -72,6 +72,7 @@ void TextFrame2PPM::createEmptyFrame(void)
 	}
 
 	textBuffer = new unsigned char [height * width];
+	memset(textBuffer, 0, height * width * sizeof(unsigned char));
 
 	//DEBUG
 	printf("complete\n");
@@ -172,9 +173,6 @@ void TextFrame2PPM::convert()
 
 	//DEBUG
 	printf("complete\n");
-
-	//Test : get frame to ppm
-	//outputFrame->saveP6PPM("test.ppm");
 }
 
 TextFrame2PPM::~TextFrame2PPM()
@@ -183,11 +181,7 @@ TextFrame2PPM::~TextFrame2PPM()
 	for ( int i = 0 ; i < MAX_OF_FONTS ; i++ )
 		delete fonts[i];
 
-	if(textBuffer == NULL)
-	{
-		delete textBuffer;
-		textBuffer = NULL;
-	}
+	delete textBuffer;
 }
 
 

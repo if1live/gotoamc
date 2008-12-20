@@ -29,12 +29,9 @@ Context::~Context()
 	{
 		fprintf(stderr, "[Context]OutputFrameHeap delete...");
 		//	assert(pOutputFrameHeap->isEmpty() == true && "OutputFrameHeap is not empty!");
-		int i = 0;
 		while(pOutputFrameHeap->isEmpty() == false)
 		{
 			Frame *frame = pOutputFrameHeap->top();
-			fprintf(stderr, "%d ", i);
-			i++;
 			delete frame;
 			pOutputFrameHeap->pop();
 		}

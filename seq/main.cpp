@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 
 	videoIO->init(argc, argv);
 
-	//	while(videoIO->isReadingComplete() == false)
-	for(int i = 0 ; i < 5 ; i++)
+//	while(videoIO->isReadingComplete() == false)
+	for(int i = 0 ; i < 100 ; i++)
 	{
 		try
 		{
@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
 		catch(const char *msg)
 		{
 			fprintf(stderr, "Except : %s\n");
+			delete context;
+			return 1;
 		}
 	}
 	delete context;	//delete context data
