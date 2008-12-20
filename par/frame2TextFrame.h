@@ -14,7 +14,6 @@ public:
 	Frame2TextFrame();
 	~Frame2TextFrame();
 	void main(void); // thread op
-	void conversionLoop(void);	//routine to get items from queue and convert it till queue is empty
 	void convertFrame(void);
 	void convertFrame(Frame* _pFrame);	// main routine for single frameconversion
 

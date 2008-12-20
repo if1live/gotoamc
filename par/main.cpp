@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	videoIO->init(argc, argv);
 
 //	while(videoIO->isReadingComplete() == false)
-	for(int i = 0 ; i < 50 ; i++)
+	for(int i = 0 ; i < 30 ; i++)
 	{
 		try
 		{

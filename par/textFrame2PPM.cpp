@@ -81,7 +81,8 @@ void TextFrame2PPM::createEmptyFrame(void)
 int TextFrame2PPM::main(void)
 {
 	//entry point
-	if(pTextFrameQueue->isEmpty() == false)
+	int limit = pContext->getFrameLimit();
+	for(int i = 0 ; i < limit ; i++)
 	{
 		convert();
 	}
@@ -99,14 +100,8 @@ void TextFrame2PPM::convert()
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
-	while(textFrame == NULL)
-	{
-		if(pTextFrameQueue->isEmpty() == false)
-		{
-			textFrame = pTextFrameQueue->front();
-			pTextFrameQueue->pop();	//get text frame : success
-		}
-	}
+	textFrame = pTextFrameQueue->pop();
+	//	pTextFrameQueue->pop();	//get text frame : success
 
 	//DEBUG
 	printf("[TextFrame2PPM] #%d convert...", textFrame->getId());
@@ -132,17 +127,10 @@ void TextFrame2PPM::convert()
 	height = height / ratio;
 	width = width / ratio;
 
-
+	//get unused frame
 	Frame *outputFrame = NULL;
-	while(outputFrame == NULL)
-	{
-		if(pUnusedOutputFrameStack->isEmpty() == false)
-		{
-			outputFrame = pUnusedOutputFrameStack->top();
-			pUnusedOutputFrameStack->pop();
-			break;	//get empty frame : success
-		}
-	}
+	outputFrame = pUnusedOutputFrameStack->pop();
+	
 	//	Frame outputFrame;
 	//    outputFrame.setBlankFrame( WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height );
 
@@ -167,6 +155,9 @@ void TextFrame2PPM::convert()
 	//save frame to data structure
 	int id = textFrame->getId();
 	outputFrame->setId(id);
+
+	delete buffer;
+	textFrame->setText(NULL);
 
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame

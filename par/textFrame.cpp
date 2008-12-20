@@ -72,14 +72,23 @@ unsigned char* TextFrame::getText(void)
 
 void TextFrame::setText(unsigned char* _text)
 {
-	int size = strlen((const char*)_text);
-	text = new unsigned char[size];
-	memcpy(this->text, _text, size * sizeof(unsigned char));
+	if(_text == NULL)
+	{
+		this->text = _text;
+		return;
+	}
+	else
+	{
+		int size = strlen((const char*)_text);
+		text = new unsigned char[size];
+		memcpy(this->text, _text, size * sizeof(unsigned char));
+		return;
+	}
 }
 
 void TextFrame::clearText(void)
 {
-	if(text)	// NOT NULL
+	if(text != NULL)	// NOT NULL
 	{
 		delete[] text;
 		text = NULL;	

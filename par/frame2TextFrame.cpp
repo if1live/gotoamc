@@ -25,19 +25,12 @@ Frame2TextFrame::~Frame2TextFrame()
 
 void Frame2TextFrame::main(void)
 {
-	conversionLoop();
-	// TODO: run this with threads
-}
-
-void Frame2TextFrame::conversionLoop(void)
-{
-	Frame* pFrame;
-	while(!pInputFrameQueue->isEmpty())
+	int limit = pContext->getFrameLimit();
+	for(int i = 0 ; i < limit ; i++)
 	{
-		pFrame = pInputFrameQueue->pop();
-		convertFrame(pFrame);
-		pUnusedInputFrameStack->push(pFrame);
+		convertFrame();
 	}
+	// TODO: run this with threads
 }
 
 void Frame2TextFrame::convertFrame(void)
