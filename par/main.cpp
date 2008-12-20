@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	pthread_create(&thrs[2], NULL, textFrame2PPMThr, (void *)textFrame2PPM);
 
 	//join thread
-	for(int i = 0 ; i < 3 ; i++)
+	for(int i = 2 ; i >= 0 ; i--)
 		pthread_join(thrs[i], NULL);
 
 

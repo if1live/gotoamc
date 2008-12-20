@@ -10,14 +10,14 @@
 
 Context::Context()
 {
-	frameLimit = 5;
-	convertingRange = 10;
-	pOutputFrameHeap = new FrameHeap(frameLimit);
-	pInputFrameQueue = new Queue<Frame *>(frameLimit);
-	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit);
-	pUnusedOutputFrameStack = new Stack<Frame *>(frameLimit);
-	pTextFrameQueue = new Queue<TextFrame *>(frameLimit);
-	pUnusedTextFrameStack = new Stack<TextFrame *>(frameLimit);
+	frameLimit = 30;
+	convertingRange = 200;
+	pOutputFrameHeap = new FrameHeap(frameLimit*2);
+	pInputFrameQueue = new Queue<Frame *>(frameLimit*2);
+	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit*2);
+	pUnusedOutputFrameStack = new Stack<Frame *>(frameLimit*2);
+	pTextFrameQueue = new Queue<TextFrame *>(frameLimit*2);
+	pUnusedTextFrameStack = new Stack<TextFrame *>(frameLimit*2);
 
 	pVideoIO = NULL;
 	pTextFrame2PPM = NULL;

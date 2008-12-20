@@ -5,7 +5,7 @@ template <class T>
 class Stack
 {
 public:
-	Stack( int _capacity = 10 );
+	Stack(int _capacity = 10 );
 	~Stack(void);
 
 	void push( T &_item );
@@ -19,6 +19,7 @@ private:
 	int capacity;
 	int m_top;
 	pthread_mutex_t mutex;
+
 };
 
 #include "stack.hpp"

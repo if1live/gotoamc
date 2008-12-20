@@ -44,24 +44,11 @@ void TextFrame2PPM::createEmptyFrame(void)
 	//DEBUG
 	printf("[TextFrame2PPM] create Empty Frame....");
 
-	//get a text frame to get text width, text height
-//	TextFrame *textFrame = NULL;
-	///TODO
-	
-/*	while(textFrame == NULL)
-	{
-		if(pTextFrameQueue->isEmpty() == false)
-		{
-			textFrame = pTextFrameQueue->front();
-			break;
-		}
-	}
-*/
 	//create unused output frame
 	int frameLimit = pContext->getFrameLimit();
 	int width = pContext->getWidth() / 2 / ratio;
 	int height = pContext->getHeight() / 2 / ratio;
-	for(int i = 0 ; i < frameLimit ; i++)
+	for(int i = 0 ; i < frameLimit*2 ; i++)
 	{
 		//create frame
 		Frame *frame = new Frame();
@@ -97,7 +84,7 @@ void TextFrame2PPM::convert()
 */
 	//request to write frame
 	int limit = pContext->getFrameLimit();
-	if(outputFrameCount == limit)
+	if(outputFrameCount >= limit)
 	{
 		VideoIO *videoIO = pContext->getVideoIO();
 		videoIO->requestToWrite(outputFrameCount);
@@ -118,7 +105,6 @@ void TextFrame2PPM::convert()
 	//	pTextFrameQueue->pop();	//get text frame : success
 
 	//DEBUG
-	printf("[TextFrame2PPM] #%d convert...", textFrame->getId());
 
 	int height = textFrame->getTextHeight();
 	int width = textFrame->getTextWidth();
@@ -146,7 +132,7 @@ void TextFrame2PPM::convert()
 	bool getFrameComplete = false;
 	while(getFrameComplete == false)
 	{
-		if(pUnusedOutputFrameStack->isEmpty() == false)
+		if(pUnusedOutputFrameStack->isEmpty() == false)	///TODO
 		{
 			outputFrame = pUnusedOutputFrameStack->pop();
 			getFrameComplete = true;
@@ -186,7 +172,7 @@ void TextFrame2PPM::convert()
 	outputFrameCount++;
 
 	//DEBUG
-	printf("complete\n");
+	fprintf(stderr, "[TextFrame2PPM] #%d convert\n", textFrame->getId());
 }
 
 TextFrame2PPM::~TextFrame2PPM()

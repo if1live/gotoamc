@@ -199,8 +199,7 @@ bool VideoIO::writeFrame(void)
 		if(pOutputFrameHeap->isEmpty() == false)
 		{
 			///TODO
-			frame = pOutputFrameHeap->top();
-			pOutputFrameHeap->pop();
+			frame = pOutputFrameHeap->pop();
 			break;	//get output frame : success
 		}
 	}
@@ -336,7 +335,7 @@ bool VideoIO::readFrame(void)
 					int h = pInputCodecCtx->height;
 					
 					Frame *frame = NULL;
-					if(pUnusedInputFrameStack->isEmpty() == true)
+					if(pUnusedInputFrameStack->isEmpty() == true)	///TODO
 					{
 						frame = new Frame(pInputCodecCtx, PIX_FMT_RGB24);
 					}

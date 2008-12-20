@@ -72,8 +72,9 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 		}
 	}
 
+	///DEBUG
+
 	aa_hardware_params hParams;	// hardware params for aalib
-	
 	aa_context *c;	// aa context
 //	aa_recommendhidisplay("teste1");
 
@@ -137,4 +138,5 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	pTextFrame->setId(id);
 	pTextFrameQueue->push(pTextFrame);
 	
+	fprintf(stderr, "[Frame2TextFrame] to ascii art : #%d\n", _pFrame->getId());
 }
