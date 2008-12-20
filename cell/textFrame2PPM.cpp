@@ -1,12 +1,19 @@
 #include <cassert>
+#include "videoIO.h"
 #include "queue.h"
 #include "textFrame2PPM.h"
 #include "context.h"
 #include "frameHeap.h"
-#include <pthread.h>
 
 TextFrame2PPM::TextFrame2PPM()
 {
+	endFlag = false;
+	index = 0;
+	pthread_mutex_init(&indexLock, NULL);
+	pthread_mutex_init(&lock1, NULL);
+	pthread_mutex_init(&lock2, NULL);
+
+	outputFrameCount = 0;
 	ratio = 4;	//resize factor	
 	textBuffer = NULL;
 	//open font ppm file : BEGIN
@@ -36,8 +43,6 @@ TextFrame2PPM::TextFrame2PPM()
 
 	//set pointer of this
 	pContext->setTextFrame2PPM(this);
-
-	isFirstRun = true;
 }
 
 void TextFrame2PPM::createEmptyFrame(void)
@@ -45,27 +50,12 @@ void TextFrame2PPM::createEmptyFrame(void)
 	//DEBUG
 	printf("[TextFrame2PPM] create Empty Frame....");
 
-	//get a text frame to get text width, text height
-	TextFrame *textFrame = NULL;
-	///TODO
-	
-	while(textFrame == NULL)
-	{
-		if(pTextFrameQueue->isEmpty() == false)
-		{
-			textFrame = pTextFrameQueue->front();
-			break;
-		}
-	}
-
+	//create unused output frame
 	int frameLimit = pContext->getFrameLimit();
-	int width;
-	int height;
-	for(int i = 0 ; i < frameLimit ; i++)
+	int width = pContext->getWidth() / 2 / ratio;
+	int height = pContext->getHeight() / 2 / ratio;
+	for(int i = 0 ; i < frameLimit*2 ; i++)
 	{
-		width = textFrame->getTextWidth() / ratio;
-		height = textFrame->getTextHeight() / ratio;
-
 		//create frame
 		Frame *frame = new Frame();
 		frame->setBlankFrame(WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height);
@@ -82,35 +72,52 @@ void TextFrame2PPM::createEmptyFrame(void)
 int TextFrame2PPM::main(void)
 {
 	//entry point
-	if(pTextFrameQueue->isEmpty() == false)
+	int range = pContext->getConvertingRange();
+	while(index < range)
 	{
 		convert();
+		incIndex();
 	}
+	
+	VideoIO *videoIO = pContext->getVideoIO();
+	videoIO->requestToWrite(-1);
+
+	fprintf(stderr, "[TextFrame2PPM] Exit <<<<<<<<<<<<<<<\n");
+	endFlag = true;
 	return 0;
 }
 
 void TextFrame2PPM::convert()
 {
-	if(isFirstRun == true)
+	//request to write frame
+	int limit = pContext->getFrameLimit();
+	if(outputFrameCount >= limit)
 	{
-		createEmptyFrame();
-		isFirstRun = false;
+		VideoIO *videoIO = pContext->getVideoIO();
+		videoIO->requestToWrite(outputFrameCount);
+		outputFrameCount = 0;
 	}
-
 
 	//get Text frame from pTextFrameQueue then convert to image, save it to pOutputFrameHeap
 	TextFrame *textFrame = NULL;
 	while(textFrame == NULL)
 	{
+		//fprintf(stderr, "%d ", outputFrameCount);
+		//locked area - start
+		pthread_mutex_lock(&lock1);
 		if(pTextFrameQueue->isEmpty() == false)
 		{
-			textFrame = pTextFrameQueue->front();
-			pTextFrameQueue->pop();	//get text frame : success
+			textFrame = pTextFrameQueue->pop();
 		}
+		pthread_mutex_unlock(&lock1);
+		//locked area - end
+		//
+		if(endFlag == true)
+			return;
 	}
+	//	pTextFrameQueue->pop();	//get text frame : success
 
 	//DEBUG
-	printf("[TextFrame2PPM] #%d convert...", textFrame->getId());
 
 	int height = textFrame->getTextHeight();
 	int width = textFrame->getTextWidth();
@@ -133,17 +140,20 @@ void TextFrame2PPM::convert()
 	height = height / ratio;
 	width = width / ratio;
 
-
+	//get unused frame
 	Frame *outputFrame = NULL;
 	while(outputFrame == NULL)
 	{
+		//locked area - start
+		pthread_mutex_lock(&lock2);
 		if(pUnusedOutputFrameStack->isEmpty() == false)
 		{
-			outputFrame = pUnusedOutputFrameStack->top();
-			pUnusedOutputFrameStack->pop();
-			break;	//get empty frame : success
+			outputFrame = pUnusedOutputFrameStack->pop();
 		}
+		pthread_mutex_unlock(&lock2);
+		//locked area - end
 	}
+	
 	//	Frame outputFrame;
 	//    outputFrame.setBlankFrame( WIDTH_OF_FONTS * width, HEIGHT_OF_FONTS * height );
 
@@ -169,11 +179,15 @@ void TextFrame2PPM::convert()
 	int id = textFrame->getId();
 	outputFrame->setId(id);
 
+	delete buffer;
+	textFrame->setText(NULL);
+
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame
+	outputFrameCount++;
 
 	//DEBUG
-	printf("complete\n");
+	fprintf(stderr, "[TextFrame2PPM] #%d convert\n", textFrame->getId());
 }
 
 TextFrame2PPM::~TextFrame2PPM()
@@ -183,6 +197,18 @@ TextFrame2PPM::~TextFrame2PPM()
 		delete fonts[i];
 
 	delete textBuffer;
+
+	//delete mutex
+	pthread_mutex_destroy(&indexLock);
+	pthread_mutex_destroy(&lock1);
+	pthread_mutex_destroy(&lock2);
+}
+
+void TextFrame2PPM::incIndex(void)
+{
+	pthread_mutex_lock(&indexLock);
+	index++;
+	pthread_mutex_unlock(&indexLock);
 }
 
 

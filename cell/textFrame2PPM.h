@@ -1,3 +1,7 @@
+#pragma once
+
+#include <pthread.h>
+
 #include "frame.h"
 #include "textFrame.h"
 
@@ -20,9 +24,9 @@ public :
 
 	int main(void);	//entry point
 	~TextFrame2PPM();
-	
-private :
 	void createEmptyFrame(void);
+
+private :
 
 	Frame *fonts[MAX_OF_FONTS];
 	
@@ -34,8 +38,17 @@ private :
 	FrameHeap *pOutputFrameHeap;
 	Stack<Frame *> *pUnusedOutputFrameStack;
 
-	bool isFirstRun;
 	int ratio;	//resize factor
 
 	unsigned char *textBuffer;
+	int outputFrameCount;	//how many image exist in outputFrameHeap?
+
+	void incIndex(void);	//index++
+
+	int index;	//how many frame to write?
+	pthread_mutex_t indexLock;
+	pthread_mutex_t lock1;
+	pthread_mutex_t lock2;
+
+	bool endFlag;
 };
