@@ -25,6 +25,7 @@ FrameHeap::~FrameHeap()
 
 bool FrameHeap::isEmpty(void)
 {
+	fprintf( stderr, "Checking Heap is Empty\n" );	//for debugging
     pthread_mutex_lock( &mutex );
 	if(heapSize == 0)
 	{
@@ -43,6 +44,7 @@ bool FrameHeap::isEmpty(void)
 
 bool FrameHeap::isFull(void)
 {
+	fprintf( stderr, "Checking Heap is Full\n" );	//for debugging
 	pthread_mutex_lock( &mutex );
 	if(heapSize == capacity - 1)
 	{
@@ -61,6 +63,7 @@ bool FrameHeap::isFull(void)
 
 Frame* FrameHeap::top(void)
 {
+	fprintf( stderr, "Starting Get Top of Heap\n" );//for debugging
 	pthread_mutex_lock( &mutex );
 	Frame* temp = ppHeap[1];
 	pthread_mutex_unlock( &mutex );
@@ -70,9 +73,9 @@ Frame* FrameHeap::top(void)
 
 void FrameHeap::push(Frame *_pFrame)
 {
+	fprintf( stderr, "Starting PUSH to Heap\n" ); 	//for debugging
 	pthread_mutex_lock( &mutex );
 	//insert _frame into min heap
-	fprintf( stderr, "Starting PUSH to Heap\n" ); 	//for debugging
 	if ( heapSize == capacity - 1 )
 	{
 		//double the capacity
@@ -93,15 +96,15 @@ void FrameHeap::push(Frame *_pFrame)
 		currentNode = currentNode / 2;
 	}
 	ppHeap[currentNode] = _pFrame;
-	fprintf( stderr, "Ended PUSH to Heap\n" ); 		//for debugging
 	pthread_mutex_unlock( &mutex );
+	fprintf( stderr, "Ended PUSH to Heap\n" ); 		//for debugging
 }
 
 Frame *FrameHeap::pop(void)
 {
+	fprintf( stderr, "Starting POP from Heap\n" ); 	//for debugging
 	pthread_mutex_lock( &mutex );
 	//save return value
-	fprintf( stderr, "Starting POP from Heap\n" ); 	//for debugging
 	Frame *returnValue = ppHeap[1];
 	
 	//delete min element

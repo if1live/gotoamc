@@ -22,6 +22,7 @@ Stack<T>::~Stack(void)
 template <class T>
 void Stack<T>::push(T &_item )
 {
+	fprintf( stderr, "Starting PUSH to Stack\n" );	//for debugging
 	pthread_mutex_lock( &mutex );
 	if ( m_top == capacity )
 	{
@@ -38,17 +39,20 @@ void Stack<T>::push(T &_item )
 
 	pArray[++m_top] = _item;
 	pthread_mutex_unlock( &mutex );
+	fprintf( stderr, "Ended PUSH to Stack\n" );		//for debugging
 }
 
 template <class T>
 T Stack<T>::pop()
 {
+	fprintf( stderr, "Starting POP from Stack\n" );	//for debugging
 	pthread_mutex_lock( &mutex );
 	if ( m_top == -1 )
 		throw "stack pop error: stack is empty";
 	
 	T temp = pArray[m_top--];
 	pthread_mutex_unlock( &mutex );
+	fprintf( stderr, "Ended POP from Stack\n" );	//for debugging
 	return temp;
 }
 
@@ -56,15 +60,18 @@ T Stack<T>::pop()
 template <class T>
 bool Stack<T>::isEmpty()
 {
+	fprintf( stderr, "Checking Stack is Empty\n" );	//for debugging
 	pthread_mutex_lock( &mutex );
 	if ( m_top == -1 )
 	{
 		pthread_mutex_unlock( &mutex );
+		fprintf( stderr, "Stack is Empty!\n" );		//for debugging
 		return true;
 	}
 	else
 	{
 		pthread_mutex_unlock( &mutex );
+		fprintf( stderr, "Stack is not Empty!\n" );	//for debugging
 		return false;
 	}
 }
@@ -73,15 +80,18 @@ bool Stack<T>::isEmpty()
 template <class T>
 bool Stack<T>::isFull()
 {
+	fprintf( stderr, "Checking Stack is Full\n" );	//for debugging
 	pthread_mutex_lock( &mutex );
 	if ( m_top == capacity )
 	{
 		pthread_mutex_unlock( &mutex );
+		fprintf( stderr, "Stack is Full!\n" );		//for debugging
 		return true;
 	}
 	else
 	{
 		pthread_mutex_unlock( &mutex );
+		fprintf( stderr, "Stack is not Full!\n" );	//for debugging
 		return false;
 	}
 }
@@ -90,8 +100,10 @@ bool Stack<T>::isFull()
 template <class T>
 T &Stack<T>::top()
 {
+	fprintf( stderr, "Starting Get Top of Stack\n" );//for debugging
 	pthread_mutex_lock( &mutex );
 	T& temp = pArray[m_top];
 	pthread_mutex_unlock( &mutex );
+	fprintf( stderr, "Get Top of Stack\n" );		//for debugging
 	return temp;
 }
