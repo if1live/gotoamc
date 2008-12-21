@@ -2,8 +2,8 @@ CC	= ppu-gcc
 CXX	= ppu-g++
 SCXX = spu-g++
 INC_PATH = -I/homes/pp/u2007141097/ps3-share/include -I/homes/pp/u2007141097/ps3-share/include/libavcodec -I/homes/pp/u2007141097/ps3-share/include/libavformat
-LIB_PATH = -L/usr/lib
-LDFLAGS = -laa -lpthread -lavformat -lavcodec -m32
+LIB_PATH = -L/homes/pp/u2007141097/ps3-share/lib
+LDFLAGS = -laa -lpthread -lavformat -lavcodec -m32 -lspe2
 CXXFLAGS = -g -m32
 EMBEDSPU = ppu-embedspu -m32
 
@@ -11,7 +11,7 @@ TARGET	= amc
 
 all: $(TARGET)
 
-$(TARGET): main.o textFrame.o textFrame2PPM.o frame.o context.o frame2TextFrame.o frameHeap.o videoIO.o
+$(TARGET): main.o textFrame.o textFrame2PPM.o frame.o context.o frame2TextFrame.o frameHeap.o videoIO.o videoIO_extra.o videoIO_spe1.o 
 	$(CXX) $(INC_PATH) $(LIB_PATH) -o $@ $^ $(LDFLAGS)
 
 main.o: main.cpp
@@ -31,7 +31,7 @@ videoIO_spe1 : videoIO_spe1.cpp
 	$(SCXX) $(INC_PATH) $(LIB_PATH) -o $@ $^
 
 videoIO_spe1.o: videoIO_spe1
-	$(EMBEDSPU) videoIO_spe1_handle videoIO_spe1 videoIO_spe1.o
+	$(EMBEDSPU) videoIO_spe1_handle $^ $@
 
 frame.o: frame.cpp
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
@@ -46,6 +46,9 @@ frameHeap.o: frameHeap.cpp frame.o
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
 
 videoIO.o: videoIO.cpp videoIO_spe1.o frame.o
+	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS) -lspe2
+
+videoIO_extra.o: videoIO_extra.cpp
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
 
 clean:

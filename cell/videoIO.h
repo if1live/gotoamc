@@ -7,7 +7,7 @@ extern "C" {
 #include <avcodec.h>
 #include <avformat.h>
 #include <stdio.h>
-
+#include <pthread.h>
 
 #ifdef __cplusplus
 }
@@ -51,7 +51,6 @@ private:
 
 	void RGB24ToYUV420P(AVFrame *_src, int _width, int _height);
 	void YUV420PToRGB24(AVFrame *_dst, int _width, int _height);
-
 	//member variable
 	AVFormatContext *pFormatCtx;
 	
@@ -85,5 +84,6 @@ private:
 	int outSize;
 
 	bool readComplete;
+
 };
 

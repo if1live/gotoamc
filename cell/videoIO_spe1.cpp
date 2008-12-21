@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <spu_intrinsics.h>
 #include "videoIO_spe1.h" 
 #include <spu_mfcio.h>
 #include "frame.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 /* typedef struct _CONTROL_BLOCK
 {
@@ -19,6 +19,7 @@
 
 int main( unsigned long long speid, unsigned long long argp, unsigned long long envp )
 {
+	
 	int x, y, i=-1, j=-1;
 	control_block_spe1 cb;
 	AVFrame src;

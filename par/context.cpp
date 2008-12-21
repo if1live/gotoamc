@@ -10,8 +10,8 @@
 
 Context::Context()
 {
-	frameLimit = 10;
-	convertingRange = 8;
+	frameLimit = 40;
+	convertingRange = 800;
 	pOutputFrameHeap = new FrameHeap(frameLimit*2);
 	pInputFrameQueue = new Queue<Frame *>(frameLimit*2);
 	pUnusedInputFrameStack = new Stack<Frame *>(frameLimit*2);

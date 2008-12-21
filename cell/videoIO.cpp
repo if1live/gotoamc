@@ -7,6 +7,23 @@
 #include "queue.h"
 #include "stack.h"
 
+//#include "videoIO_extra.h"
+#include <libspe2.h>
+//#include "videoIO_spe1.h"
+//#include "videoIO_extra.h"
+
+
+//extern spe_program_handle_t videoIO_spe1_handle;
+//extern spe_program_handle_t videoIO_spe2_handle;
+
+extern void* runSPE1(void *arg);
+//extern void* runSPE2(void* arg);
+
+//spe_context_ptr_t rgb2yuvCtx;
+//spe_context_ptr_t yuv2rgbCtx;
+
+//control_block_spe1 cb __attribute__((aligned(128)));
+
 VideoIO::VideoIO()
 {
 	frameIndex = 0;
@@ -48,6 +65,8 @@ VideoIO::VideoIO()
 
 	//set pointer of this
 	pContext->setVideoIO(this);
+
+
 }
 
 VideoIO::~VideoIO()
@@ -405,6 +424,7 @@ bool VideoIO::saveFrame(Frame *_pFrame)
 	return _pFrame->saveP6PPM(filename);
 }
 
+// SPE program spe1 works for this
 void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 {
 	//convert RGB24(_src) to YUV420(pOutputFrame...class member variable)
@@ -426,38 +446,16 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 		pOutputFrame->linesize[1] = w / 2;
 		pOutputFrame->linesize[2] = w / 2;
 	}
+	
+	// prepare threads
+	pthread_t tid;	// thread id
 
-	//Y
-	for(int y = 0 ; y < h ; y++)
-	{
-		for(int x = 0 ; x < w; x++)
-		{
-			uint8_t r = *(_src->data[0] + y * _src->linesize[0] + (3*x));
-			uint8_t g = *(_src->data[0] + y * _src->linesize[0] + (3*x + 1));
-			uint8_t b = *(_src->data[0] + y * _src->linesize[0] + (3*x + 2));
-
-			uint8_t resultY  = (0.257 * r) + (0.504 * g) + (0.098 * b) + 16;
-
-			pOutputFrame->data[0][y * pOutputFrame->linesize[0] + x] = resultY;
-		}
-	}
-
-	//Cb, Cr
-	for(int y = 0 ; y < h / 2 ; y++)
-	{
-		for(int x = 0 ; x < w / 2 ; x++)
-		{
-			uint8_t r = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x));
-			uint8_t g = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x + 1));
-			uint8_t b = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x + 2));
-			
-			uint8_t resultCr = (0.439 * r) - (0.368 * g) - (0.071 * b) + 128;
-			uint8_t resultCb = -(0.148 * r) - (0.291 * g) + (0.439 * b) + 128;
-			
-			pOutputFrame->data[1][y * pOutputFrame->linesize[1] + x] = resultCr;
-			pOutputFrame->data[2][y * pOutputFrame->linesize[2] + x] = resultCb;
-		}
-	}
+	// create thread
+	pthread_create(&tid, NULL, runSPE1, _src);
+	
+	// join thread
+	pthread_join(tid, NULL);
+	
 }
 
 
