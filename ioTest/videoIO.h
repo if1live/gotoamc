@@ -52,6 +52,8 @@ private:
 	void RGB24ToYUV420P(AVFrame *_src, int _width, int _height);
 	void YUV420PToRGB24(AVFrame *_dst, int _width, int _height);
 
+	Frame *dummy;
+
 	//member variable
 	AVFormatContext *pFormatCtx;
 	

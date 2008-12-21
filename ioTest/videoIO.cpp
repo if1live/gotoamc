@@ -324,7 +324,7 @@ bool VideoIO::readFrame(void)
 					fprintf(stderr, "read frame#%d\n", frame->getId());
 					
 					//complete read a frame, then push to queue
-					pInputFrameQueue->push(frame);
+					pUnusedInputFrameStack->push(frame);
 										
 					incFrameIndex();
 								
