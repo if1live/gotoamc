@@ -21,8 +21,6 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 {
 	int x, y, i=-1, j=-1;
 	control_block_spe1 cb;
-	AVFrame src;
-	AVFrame output;
 	vector float* rVal;
 	vector float* gVal;
 	vector float* bVal;
@@ -58,13 +56,23 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 	uint8_t Yy;
 	uint8_t Cr;
 	uint8_t Cb;
-	
-
+	uint8_t* inputR;
+	uint8_t* inputG;
+	uint8_t* inputB;
+	uint8_t* inputR2;
+	uint8_t* inputG2;
+	uint8_t* inputB2;
+   
 	mfc_get( &cb, argp, sizeof( cb ), 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
 
-	mfc_get( &src, cb.AVFAddress, cb.sizeOfAVF, 31, 0, 0 );
+	mfc_get( inputR, cb.rValAddr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_get( inputG, cb.gValAddr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_get( inputB, cb.bValAddr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_get( inputR2, cb.rVal2Addr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_get( inputG2, cb.gVal2Addr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_get( inputB2, cb.bVal2Addr, cb.sizeOfarray, 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
 
@@ -78,7 +86,6 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 	CbVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 ); 
 	CrVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 ); 
 	
-	/*
 	for ( y = 0 ; y < cb.height ; y++ )
 	{
 		for ( x = 0 ; x < cb.width ; x++ )
@@ -90,18 +97,17 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 					 j++;
 			}
 			
-			rVal[i] = spu_promote( (float) *(src.data[0] + y * src.linesize[0] + (3*x)), ( x + ( y * cb.height ) ) % 4 );
-			gVal[i] = (float) spu_promote( (unsigned int) src.data[0] + y * src.linesize[0] + (3*x + 1), ( x + ( y * cb.height ) ) % 4 ); 
-			bVal[i] = (float) spu_promote( (unsigned int) src.data[0] + y * src.linesize[0] + (3*x + 2), ( x + ( y * cb.height ) ) % 4 );
+			rVal[i] = spu_promote( (float) inputR[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
+			gVal[i] = spu_promote( (float) inputG[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
+			bVal[i] = spu_promote( (float) inputB[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
 			if ( y < (cb.height / 2) && x < (cb.width / 2) )
 			{
-				rVal2[j] = (float) spu_promote( (unsigned int) src.data[0] + y * 2 * src.linesize[0] + (3*2*x), ( x + ( y * cb.height ) ) % 4 );
-				gVal2[j] = (float) spu_promote( (unsigned int) src.data[0] + y * 2 * src.linesize[0] + (3*2*x + 1), ( x + ( y * cb.height ) ) % 4 ); 
-				bVal2[j] = (float) spu_promote( (unsigned int) src.data[0] + y * 2 * src.linesize[0] + (3*2*x + 2), ( x + ( y * cb.height ) ) % 4 );
+				rVal2[j] = spu_promote( (float) inputR2[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
+				gVal2[j] = spu_promote( (float) inputG2[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
+				bVal2[j] = spu_promote( (float) inputB2[y*cb.height + x], ( x + ( y * cb.height ) ) % 4 );
 			}
 		}
 	}
-*/
 
 	for ( i = 0 ; i < ( cb.height + cb.width ) / 4 ; i++ )
 	{
