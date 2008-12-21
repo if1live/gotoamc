@@ -62,8 +62,8 @@ void TextFrame2PPM::createEmptyFrame(void)
 		pUnusedOutputFrameStack->push(frame);
 	}
 
-	textBuffer = new unsigned char [height * width];
-	memset(textBuffer, 0, height * width * sizeof(unsigned char));
+	textBuffer = new char [height * width];
+	memset(textBuffer, 0, height * width * sizeof(char));
 
 	//DEBUG
 	printf("complete\n");
@@ -121,7 +121,7 @@ void TextFrame2PPM::convert()
 
 	int height = textFrame->getTextHeight();
 	int width = textFrame->getTextWidth();
-	unsigned char *buffer = textFrame->getText();
+	char *buffer = textFrame->getText();
 	//	char* testChar = " abc  bca  cab "
 	
 	//resize text frame(buffer)
@@ -178,9 +178,6 @@ void TextFrame2PPM::convert()
 	//save frame to data structure
 	int id = textFrame->getId();
 	outputFrame->setId(id);
-
-	delete buffer;
-	textFrame->setText(NULL);
 
 	pUnusedTextFrameStack->push(textFrame);
 	pOutputFrameHeap->push(outputFrame);	//save converted frame

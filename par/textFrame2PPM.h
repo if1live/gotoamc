@@ -40,7 +40,7 @@ private :
 
 	int ratio;	//resize factor
 
-	unsigned char *textBuffer;
+	char *textBuffer;
 	int outputFrameCount;	//how many image exist in outputFrameHeap?
 
 	void incIndex(void);	//index++

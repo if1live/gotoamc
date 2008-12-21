@@ -59,7 +59,7 @@ void TextFrame2PPM::createEmptyFrame(void)
 
 	int width;
 	int height;
-	for(int i = 0 ; i < 10 ; i++)
+	for(int i = 0 ; i < 1 ; i++)
 	{
 		width = textFrame->getTextWidth() / ratio;
 		height = textFrame->getTextHeight() / ratio;

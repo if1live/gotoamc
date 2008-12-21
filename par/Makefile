@@ -1,6 +1,6 @@
 CC	= gcc
 CXX	= g++
-INC_PATH = -I/homes/pp/u2007141097/xeon-share/include -I/homes/pp/u2007141097/xeon-share/include/libavcodec -I/homes/pp/u2007141097/xeon-share/include/libavformat -I/usr/include -I/usr/include/ffmpeg/ -I/usr/include/libavcodec -I/usr/include/libavformat
+INC_PATH = -I/homes/pp/u2007141097/xeon-share/include -I/homes/pp/u2007141097/xeon-share/include/libavcodec -I/homes/pp/u2007141097/xeon-share/include/libavformat -I/usr/include -I/usr/include/ffmpeg/ -I/usr/include/libavcodec -I/usr/include/libavformat -I/usr/include/ffmpeg/libavcodec/ -I/usr/include/ffmpeg/libavformat
 LIB_PATH = -L/homes/pp/u2007141097/xeon-share/lib
 LDFLAGS = -laa -lpthread -lavformat -lavcodec 
 CXXFLAGS = -g 

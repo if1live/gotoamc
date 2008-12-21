@@ -161,7 +161,7 @@ void Frame2TextFrame::convertFrame(Frame* _pFrame)
 	aa_render(c, &aa_rp, 0, 0, textWidth, textHeight);
 	aa_flush(c);
 
-	pTextFrame->setText(aa_text(c));	// save converted text
+	pTextFrame->setText((const char*)aa_text(c));	// save converted text
 	aa_close(c);	// close used aa context
 
 	// push to the text frame queue

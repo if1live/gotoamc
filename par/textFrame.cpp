@@ -1,5 +1,6 @@
 #include "textFrame.h"
 #include <iostream>
+#include <cassert>
 #include <cstring>
 
 TextFrame::TextFrame()
@@ -65,25 +66,28 @@ void TextFrame::setTextHeight(int _textHeight)
 	this->textHeight = _textHeight;
 }
 
-unsigned char* TextFrame::getText(void)
+char* TextFrame::getText(void)
 {
 	return this->text;
 }
 
-void TextFrame::setText(unsigned char* _text)
+void TextFrame::setText(const char* _text)
 {
-	if(_text == NULL)
+	assert(_text != NULL && "text is null!");
+	static int prevSize;
+	int size = strlen(_text) + 1;
+
+	if(text == NULL)	//first run
 	{
-		this->text = _text;
-		return;
+		text = new char[size];
 	}
-	else
+	else if(size != prevSize)	//text size different
 	{
-		int size = strlen((const char*)_text);
-		text = new unsigned char[size];
-		memcpy(this->text, _text, size * sizeof(unsigned char));
-		return;
+		delete text;
+		text = new char[size];
 	}
+	strncpy(text, _text, size);
+	prevSize = size;
 }
 
 void TextFrame::clearText(void)
