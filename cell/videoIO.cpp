@@ -7,6 +7,13 @@
 #include "queue.h"
 #include "stack.h"
 
+#include "videoIO_spe1.h"
+#include <libspe2.h>
+
+// program handle for videoIO_spe1 and videoIO_spe2
+extern spe_program_handle_t videoIO_spe1_handle;
+extern spe_program_handle_t videoIO_spe2_handle;
+
 VideoIO::VideoIO()
 {
 	writingRequested = 0;
@@ -430,8 +437,9 @@ bool VideoIO::saveFrame(Frame *_pFrame)
 	return _pFrame->saveP6PPM(filename);
 }
 
+// videoIO_spe1.cpp
 void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
-{
+{	
 	//convert RGB24(_src) to YUV420(pOutputFrame...class member variable)
 	int w = _width;
 	int h = _height;
@@ -452,39 +460,61 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 		pOutputFrame->linesize[2] = w / 2;
 	}
 
-	//Y
-	for(int y = 0 ; y < h ; y++)
+	// start jobs with spe
+	uint64_t* arrayY, *arrayCr, *arrayCb;
+	spe_context_ptr_t ctx;
+
+	// create the spe context
+	ctx = spe_context_create(0, NULL);
+	if(!ctx)
+		throw "videoIO: spe1 spe_context_create error!";
+	
+	// load the program handle into the context
+	retval = spe_program_load(ctx, &video_spe1_handle);
+	if(retval)
+		throw "videoIO: spe1 spe_program load error!";
+	
+	// manage spe action
+	control_block cb __attribute__((aligned(128)));
+	unsigned int entry_point;	// start address
+	int retval;	// return value from spe thread
+			
+	// control block value set
+	cb.width = _width;
+	cb.height = _height;
+	cb.AVFAddress = _src;
+	cb.sizeOfAVF = sizeof(AVFrame);
+	cb.sizeOfarray = sizeof( uint8_t ) * _width * _height;
+	arrayY = new uint64_t[cb.sizeOfarray];
+	arrayCr = new uint64_t[cb.sizeOfarray];
+	arrayCb = new uint64_t[cb.sizeOfarray];
+	cb.arrayAddressY = arrayY;
+	cb.arrayAddressCr = arrayCr;
+	cb.arrayAddressCb = arrayCb;
+
+	// run the program inside the context
+	entry_point = SPE_DEFAULT_ENTRY;
+	
+	for(int i=0; i<h; i++)
 	{
-		for(int x = 0 ; x < w; x++)
+		retval = spe_context_run(ctx, &entry_point, 0, &cb, NULL, NULL);
+		if(retval < 0)
+			throw "videoIO: spe1 spe_context_run error!";
+		
+		// save new data to pOutputFrame
+		for(j=0; j<w; j++)
 		{
-			uint8_t r = *(_src->data[0] + y * _src->linesize[0] + (3*x));
-			uint8_t g = *(_src->data[0] + y * _src->linesize[0] + (3*x + 1));
-			uint8_t b = *(_src->data[0] + y * _src->linesize[0] + (3*x + 2));
-
-			uint8_t resultY  = (0.257 * r) + (0.504 * g) + (0.098 * b) + 16;
-
-			pOutputFrame->data[0][y * pOutputFrame->linesize[0] + x] = resultY;
+			pOutputFrame->data[0][i * pOutputFrame->linesize[0] + j] = arrayY;
+			pOutputFrame->data[1][i * pOutputFrame->linesize[1] + j] = arrayCr;
+			pOutputFrame->data[2][i * pOUtputFRame->linesize[2] + j] = arrayCb;	
 		}
 	}
 
-	//Cb, Cr
-	for(int y = 0 ; y < h / 2 ; y++)
-	{
-		for(int x = 0 ; x < w / 2 ; x++)
-		{
-			uint8_t r = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x));
-			uint8_t g = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x + 1));
-			uint8_t b = *(_src->data[0] + y*2*_src->linesize[0] + (3*2*x + 2));
-			
-			uint8_t resultCr = (0.439 * r) - (0.368 * g) - (0.071 * b) + 128;
-			uint8_t resultCb = -(0.148 * r) - (0.291 * g) + (0.439 * b) + 128;
-			
-			pOutputFrame->data[1][y * pOutputFrame->linesize[1] + x] = resultCr;
-			pOutputFrame->data[2][y * pOutputFrame->linesize[2] + x] = resultCb;
-		}
-	}
+	// free the data
+	delete[] arrayY;
+	delete[] arrayCr;
+	delete[] arrayCb;
 }
-
 
 void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
 {
@@ -516,7 +546,6 @@ void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)
 		}
 	}
 }
-
 
 bool VideoIO::isReadingComplete(void)
 {

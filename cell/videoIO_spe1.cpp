@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <spu_intrinsics.h>
+#include "videoIO_spe1.h" 
+#include <spu_mfcio.h>
 
 /* typedef struct _CONTROL_BLOCK
 {
@@ -8,7 +10,7 @@
 	uint64_t AVFAddress;	// address of AVFrame
 	unsigned int sizeOfAVF;	// size of AVFrame
 	uint64_t arrayAddressY;	// address of array for saving yvalues
-	unsigned int sizeOfop;	// size of array
+	unsigned int sizeOfarray;	// size of array
 	uint64_t arrayAddressCr;// address of array for saving Crvalues
 	uint64_t arrayAddressCb;// address of array for saving Cbvalues
 } control_block; */
@@ -16,7 +18,7 @@
 int main( unsigned long long speid, unsigned long long argp, unsigned long long envp )
 {
 	int x, y, i=-1, j=-1;
-	control_block cb;
+	control_block_spe1 cb;
 	AVFrame src;
 	AVFrame output;
 	vector unsigned int* rVal;
