@@ -7,22 +7,10 @@
 #include "queue.h"
 #include "stack.h"
 
-//#include "videoIO_extra.h"
 #include <libspe2.h>
-//#include "videoIO_spe1.h"
-//#include "videoIO_extra.h"
-
-
-//extern spe_program_handle_t videoIO_spe1_handle;
-//extern spe_program_handle_t videoIO_spe2_handle;
 
 extern void* runSPE1(void *arg);
-//extern void* runSPE2(void* arg);
-
-//spe_context_ptr_t rgb2yuvCtx;
-//spe_context_ptr_t yuv2rgbCtx;
-
-//control_block_spe1 cb __attribute__((aligned(128)));
+extern void* runSPE2(void* arg);
 
 VideoIO::VideoIO()
 {
