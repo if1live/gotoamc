@@ -20,7 +20,7 @@
 int main( unsigned long long speid, unsigned long long argp, unsigned long long envp )
 {
 	int x, y, i=-1, j=-1;
-	control_block_spe1 cb;
+	control_block_spe1 cb __attribute__ ((aligned (128)));
 	vector float* rVal;
 	vector float* gVal;
 	vector float* bVal;
@@ -56,25 +56,60 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 	uint8_t Yy;
 	uint8_t Cr;
 	uint8_t Cb;
-	uint8_t* inputR;
-	uint8_t* inputG;
-	uint8_t* inputB;
-	uint8_t* inputR2;
-	uint8_t* inputG2;
-	uint8_t* inputB2;
+	uint8_t* inputR = new uint8_t[cb.sizeOfarray];
+	uint8_t* inputG = new uint8_t[cb.sizeOfarray];
+	uint8_t* inputB = new uint8_t[cb.sizeOfarray];
+	uint8_t* inputR2 = new uint8_t[cb.sizeOfarray];
+	uint8_t* inputG2 = new uint8_t[cb.sizeOfarray];
+	uint8_t* inputB2 = new uint8_t[cb.sizeOfarray];
    
 	mfc_get( &cb, argp, sizeof( cb ), 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
+	fprintf(stderr, "++++++++++++++++++++++++++++1st\n");
 
 	mfc_get( inputR, cb.rValAddr, cb.sizeOfarray, 31, 0, 0 );
-	mfc_get( inputG, cb.gValAddr, cb.sizeOfarray, 31, 0, 0 );
-	mfc_get( inputB, cb.bValAddr, cb.sizeOfarray, 31, 0, 0 );
-	mfc_get( inputR2, cb.rVal2Addr, cb.sizeOfarray, 31, 0, 0 );
-	mfc_get( inputG2, cb.gVal2Addr, cb.sizeOfarray, 31, 0, 0 );
-	mfc_get( inputB2, cb.bVal2Addr, cb.sizeOfarray, 31, 0, 0 );
 	mfc_write_tag_mask( 1<<31 );
 	mfc_read_tag_status_all();
+	mfc_get( inputG, cb.gValAddr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( inputB, cb.bValAddr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( inputR2, cb.rVal2Addr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( inputG2, cb.gVal2Addr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( inputB2, cb.bVal2Addr, cb.sizeOfarray, 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );	
+	mfc_read_tag_status_all();
+
+/*	for ( x = 0 ; x < cb.width * cb.height ; x++ )
+	{
+	mfc_get( &inputR[x], cb.rValAddr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( &inputG[x], cb.gValAddr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( &inputB[x], cb.bValAddr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( &inputR2[x], cb.rVal2Addr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( &inputG2[x], cb.gVal2Addr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );
+	mfc_read_tag_status_all();
+	mfc_get( &inputB2[x], cb.bVal2Addr + (sizeof( uint8_t ) * x), sizeof( uint8_t ), 31, 0, 0 );
+	mfc_write_tag_mask( 1<<31 );	
+	mfc_read_tag_status_all();
+	}
+*/	
+	fprintf(stderr, "++++++++++++++++++++++++++++2nd\n");
 
 	rVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 );
 	bVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 ); 
@@ -172,6 +207,13 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 	free( yVal );
 	free( CbVal );
 	free( CrVal );
+
+	delete[] inputR;
+	delete[] inputG;
+	delete[] inputB;
+	delete[] inputR2;
+	delete[] inputG2;
+	delete[] inputB2;
 	
 	return 0;
 }

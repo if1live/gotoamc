@@ -11,8 +11,8 @@ TARGET	= amc
 
 all: $(TARGET)
 
-$(TARGET): main.o textFrame.o textFrame2PPM.o frame.o context.o frame2TextFrame.o frameHeap.o videoIO.o
-	$(CXX) $(INC_PATH) $(LIB_PATH) -o $@ $^ $(LDFLAGS)
+$(TARGET): main.o textFrame.o textFrame2PPM.o frame.o context.o frame2TextFrame.o frameHeap.o videoIO.o videoIO_spe1.o
+	$(CXX) $(INC_PATH) $(LIB_PATH) -o $@ $^ $(LDFLAGS) -lspe2
 
 main.o: main.cpp
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
@@ -23,9 +23,9 @@ textFrame.o: textFrame.cpp
 textFrame2PPM.o: textFrame2PPM.cpp textFrame.o frame.o
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
 
-	#TODO
-textFrame2PPM_spe.o: textFrame2PPM_spe.cpp
-	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ 
+#TODO
+#textFrame2PPM_spe.o: textFrame2PPM_spe.cpp
+#	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ 
 
 videoIO_spe1 : videoIO_spe1.cpp
 	$(SCXX) $(INC_PATH) $(LIB_PATH) -o $@ $^
@@ -46,7 +46,7 @@ frameHeap.o: frameHeap.cpp frame.o
 	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
 
 videoIO.o: videoIO.cpp videoIO_spe1.o frame.o
-	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS)
+	$(CXX) $(INC_PATH) $(LIB_PATH) -c $^ $(CXXFLAGS) -lspe2
 
 clean:
 	rm *.o $(TARGET)

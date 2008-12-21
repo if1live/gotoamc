@@ -484,8 +484,6 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	// control block value set
 	cb.width = _width;
 	cb.height = _height;
-	cb.AVFAddress = (uint64_t)_src;
-	cb.sizeOfAVF = sizeof(AVFrame);
 	cb.sizeOfarray = sizeof( uint8_t ) * _width * _height;
 	arrayY = new uint8_t[cb.sizeOfarray];
 	arrayCr = new uint8_t[cb.sizeOfarray];
@@ -497,21 +495,21 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	arrayG2 = new uint8_t[cb.sizeOfarray];
 	arrayB2 = new uint8_t[cb.sizeOfarray];
 
-	cb.arrayAddressY = (uint64_t)arrayY;
-	cb.arrayAddressCr = (uint64_t)arrayCr;
-	cb.arrayAddressCb = (uint64_t)arrayCb;
-	cb.rValAddr = (uint64_t)arrayR;
-	cb.gValAddr = (uint64_t)arrayG;
-	cb.bValAddr = (uint64_t)arrayB;
-	cb.rVal2Addr = (uint64_t)arrayR2;
-	cb.gVal2Addr = (uint64_t)arrayG2;
-	cb.bVal2Addr = (uint64_t)arrayB2;
+	cb.arrayAddressY = (uint32_t)arrayY;
+	cb.arrayAddressCr = (uint32_t)arrayCr;
+	cb.arrayAddressCb = (uint32_t)arrayCb;
+	cb.rValAddr = (uint32_t)arrayR;
+	cb.gValAddr = (uint32_t)arrayG;
+	cb.bValAddr = (uint32_t)arrayB;
+	cb.rVal2Addr = (uint32_t)arrayR2;
+	cb.gVal2Addr = (uint32_t)arrayG2;
+	cb.bVal2Addr = (uint32_t)arrayB2;
 	
 	// fill rgb, rgb2 arrays
 	int i=-1, j=-1;
 	for(int y=0; y<h; y++)
 	{
-		for(Int x=0; x<w; x++)
+		for(int x=0; x<w; x++)
 		{
 			if((x+(y*h)) % 4 == 0)
 			{
@@ -520,25 +518,27 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 					j++;
 			}
 		
-			arrayR[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x));
-			arrayG[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x + 1));
-			arrayB[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x + 2));
+			arrayR[i] = *(_src->data[0] + y * _src->linesize[0] + (3*x));
+			arrayG[i] = *(_src->data[0] + y * _src->linesize[0] + (3*x + 1));
+			arrayB[i] = *(_src->data[0] + y * _src->linesize[0] + (3*x + 2));
 		
 			if(y < (h/2) && x < (w/2))
 			{
-				arrayR2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x));
-				arrayG2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x+1));
-				arrayB2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x+2));
+				arrayR2[j] = *(_src->data[0] + y * 2* _src->linesize[0] + (3*2*x));
+				arrayG2[j] = *(_src->data[0] + y * 2* _src->linesize[0] + (3*2*x+1));
+				arrayB2[j] = *(_src->data[0] + y * 2* _src->linesize[0] + (3*2*x+2));
 			}
-
-
+		}
+	}
+	fprintf( stderr, "Starting SPEs : %dbytes\n", sizeof( cb ) );
 	// run the program inside the context
 	entry_point = SPE_DEFAULT_ENTRY;
 	
 	retval = spe_context_run(ctx, &entry_point, 0, &cb, NULL, NULL);
 	if(retval < 0)
 		throw "videoIO: spe1 spe_context_run error!";
-	
+
+	fprintf( stderr, "Ended SPEs\n" );
 	for(int i=0; i<h; i++)
 	{
 		// save new data to pOutputFrame
@@ -549,7 +549,7 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 			pOutputFrame->data[2][i * pOutputFrame->linesize[2] + j] = arrayCb[i*h +j];
 		}
 	}
-
+	fprintf( stderr, "Checking point\n" ); 
 	// free the data
 	delete[] arrayY;
 	delete[] arrayCr;
