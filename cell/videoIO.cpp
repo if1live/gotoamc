@@ -461,7 +461,9 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	}
 
 	// start jobs with spe
-	uint64_t* arrayY, *arrayCr, *arrayCb;
+	uint8_t* arrayY, *arrayCr, *arrayCb;
+	uint8_t* arrayR, *arrayG, *arrayB;
+	uint8_t* arrayR2, *arrayG2, *arrayB2;
 	spe_context_ptr_t ctx;
 
 	// create the spe context
@@ -485,12 +487,50 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	cb.AVFAddress = (uint64_t)_src;
 	cb.sizeOfAVF = sizeof(AVFrame);
 	cb.sizeOfarray = sizeof( uint8_t ) * _width * _height;
-	arrayY = new uint64_t[cb.sizeOfarray];
-	arrayCr = new uint64_t[cb.sizeOfarray];
-	arrayCb = new uint64_t[cb.sizeOfarray];
+	arrayY = new uint8_t[cb.sizeOfarray];
+	arrayCr = new uint8_t[cb.sizeOfarray];
+	arrayCb = new uint8_t[cb.sizeOfarray];
+	arrayR = new uint8_t[cb.sizeOfarray];
+	arrayG = new uint8_t[cb.sizeOfarray];
+	arrayB = new uint8_t[cb.sizeOfarray];
+	arrayR2 = new uint8_t[cb.sizeOfarray];
+	arrayG2 = new uint8_t[cb.sizeOfarray];
+	arrayB2 = new uint8_t[cb.sizeOfarray];
+
 	cb.arrayAddressY = (uint64_t)arrayY;
 	cb.arrayAddressCr = (uint64_t)arrayCr;
 	cb.arrayAddressCb = (uint64_t)arrayCb;
+	cb.rValAddr = (uint64_t)arrayR;
+	cb.gValAddr = (uint64_t)arrayG;
+	cb.bValAddr = (uint64_t)arrayB;
+	cb.rVal2Addr = (uint64_t)arrayR2;
+	cb.gVal2Addr = (uint64_t)arrayG2;
+	cb.bVal2Addr = (uint64_t)arrayB2;
+	
+	// fill rgb, rgb2 arrays
+	int i=-1, j=-1;
+	for(int y=0; y<h; y++)
+	{
+		for(Int x=0; x<w; x++)
+		{
+			if((x+(y*h)) % 4 == 0)
+			{
+				i++;
+				if(y < (h/2) && x < (w/2))
+					j++;
+			}
+		
+			arrayR[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x));
+			arrayG[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x + 1));
+			arrayB[i] = *(_src.data[0] + y * _src.linesize[0] + (3*x + 2));
+		
+			if(y < (h/2) && x < (w/2))
+			{
+				arrayR2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x));
+				arrayG2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x+1));
+				arrayB2[j] = *(_src.data[0] + y * 2* src.linesize[0] + (3*2*x+2));
+			}
+
 
 	// run the program inside the context
 	entry_point = SPE_DEFAULT_ENTRY;
@@ -514,6 +554,17 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	delete[] arrayY;
 	delete[] arrayCr;
 	delete[] arrayCb;
+	delete[] arrayR;
+	delete[] arrayG;
+	delete[] arrayB;
+	delete[] arrayR2;
+	delete[] arrayG2;
+	delete[] arrayB2;
+
+	//destroy context
+	retval = spe_context_destroy(ctx);
+	if(retval)
+		throw "videoIO_spe1: spe_context_destroy error!";	
 }
 
 void VideoIO::YUV420PToRGB24(AVFrame *_dst, int _width, int _height)

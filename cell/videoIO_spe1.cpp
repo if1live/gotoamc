@@ -78,6 +78,7 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 	CbVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 ); 
 	CrVal = (vector float*) malloc( sizeof( vector float ) * cb.width * cb.height / 4 ); 
 	
+	/*
 	for ( y = 0 ; y < cb.height ; y++ )
 	{
 		for ( x = 0 ; x < cb.width ; x++ )
@@ -100,6 +101,7 @@ int main( unsigned long long speid, unsigned long long argp, unsigned long long 
 			}
 		}
 	}
+*/
 
 	for ( i = 0 ; i < ( cb.height + cb.width ) / 4 ; i++ )
 	{
