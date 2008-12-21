@@ -469,44 +469,44 @@ void VideoIO::RGB24ToYUV420P(AVFrame *_src, int _width, int _height)
 	if(!ctx)
 		throw "videoIO: spe1 spe_context_create error!";
 	
-	// load the program handle into the context
-	retval = spe_program_load(ctx, &video_spe1_handle);
-	if(retval)
-		throw "videoIO: spe1 spe_program load error!";
-	
 	// manage spe action
-	control_block cb __attribute__((aligned(128)));
+	control_block_spe1 cb __attribute__((aligned(128)));
 	unsigned int entry_point;	// start address
 	int retval;	// return value from spe thread
 			
+	// load the program handle into the context
+	retval = spe_program_load(ctx, &videoIO_spe1_handle);
+	if(retval)
+		throw "videoIO: spe1 spe_program load error!";
+	
 	// control block value set
 	cb.width = _width;
 	cb.height = _height;
-	cb.AVFAddress = _src;
+	cb.AVFAddress = (uint64_t)_src;
 	cb.sizeOfAVF = sizeof(AVFrame);
 	cb.sizeOfarray = sizeof( uint8_t ) * _width * _height;
 	arrayY = new uint64_t[cb.sizeOfarray];
 	arrayCr = new uint64_t[cb.sizeOfarray];
 	arrayCb = new uint64_t[cb.sizeOfarray];
-	cb.arrayAddressY = arrayY;
-	cb.arrayAddressCr = arrayCr;
-	cb.arrayAddressCb = arrayCb;
+	cb.arrayAddressY = (uint64_t)arrayY;
+	cb.arrayAddressCr = (uint64_t)arrayCr;
+	cb.arrayAddressCb = (uint64_t)arrayCb;
 
 	// run the program inside the context
 	entry_point = SPE_DEFAULT_ENTRY;
 	
+	retval = spe_context_run(ctx, &entry_point, 0, &cb, NULL, NULL);
+	if(retval < 0)
+		throw "videoIO: spe1 spe_context_run error!";
+	
 	for(int i=0; i<h; i++)
 	{
-		retval = spe_context_run(ctx, &entry_point, 0, &cb, NULL, NULL);
-		if(retval < 0)
-			throw "videoIO: spe1 spe_context_run error!";
-		
 		// save new data to pOutputFrame
-		for(j=0; j<w; j++)
+		for(int j=0; j<w; j++)
 		{
-			pOutputFrame->data[0][i * pOutputFrame->linesize[0] + j] = arrayY;
-			pOutputFrame->data[1][i * pOutputFrame->linesize[1] + j] = arrayCr;
-			pOutputFrame->data[2][i * pOUtputFRame->linesize[2] + j] = arrayCb;	
+			pOutputFrame->data[0][i * pOutputFrame->linesize[0] + j] = arrayY[i*h + j];
+			pOutputFrame->data[1][i * pOutputFrame->linesize[1] + j] = arrayCr[i*h +j];
+			pOutputFrame->data[2][i * pOutputFrame->linesize[2] + j] = arrayCb[i*h +j];
 		}
 	}
 
