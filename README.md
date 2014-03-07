@@ -1,0 +1,4 @@
+gotoamc
+=======
+
+go to amc
